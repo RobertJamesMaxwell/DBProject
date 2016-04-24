@@ -8,7 +8,7 @@ import javax.swing.JOptionPane;
 
 public class Section {
 	
-	final String addSectionString = "INSERT INTO person VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	final String addSectionString = "INSERT INTO section VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	private PreparedStatement ps;
 	
 	private String cCode;
@@ -102,6 +102,11 @@ public class Section {
 			ps.setInt(2, this.secNo );
 			ps.setString(3, this.semester );
 			ps.setInt(4, this.year );
+			ps.setString(5, this.date );
+			ps.setString(6, this.format );
+			ps.setFloat(7, this.priceChange );
+			ps.setInt(8, this.currentEnrollment );
+			ps.setInt(9, this.maxEnrollment );
 			return ps.executeUpdate();
 				
 			

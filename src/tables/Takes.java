@@ -16,7 +16,7 @@ public class Takes {
 		setYear(section.getYear());
 	}
 	
-	final String addTakesString = "INSERT INTO person VALUES(?, ?, ?, ?, ?)";
+	final String addTakesString = "INSERT INTO takes VALUES(?, ?, ?, ?, ?)";
 	private PreparedStatement ps;
 	
 	private int perID;
