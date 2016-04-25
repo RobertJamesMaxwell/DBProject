@@ -1,4 +1,5 @@
 package dbgui;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
@@ -13,6 +14,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -78,7 +80,7 @@ public class Queries extends javax.swing.JFrame {
 				compID.setBounds(750, 0, 119, 28);
 			}
 			{
-				compIDField = new JTextField("Enter company ID");
+				compIDField = new JTextField("");
 				getContentPane().add(compIDField);
 				compIDField.setBounds(900, 0, 119, 28);
 				compIDField.setEditable(false);
@@ -92,7 +94,7 @@ public class Queries extends javax.swing.JFrame {
 				perID.setBounds(750, 50, 119, 28);
 			}
 			{
-				perIDField = new JTextField("Enter person ID");
+				perIDField = new JTextField("");
 				getContentPane().add(perIDField);
 				perIDField.setBounds(900, 50, 119, 28);
 				perIDField.setEditable(false);
@@ -106,7 +108,7 @@ public class Queries extends javax.swing.JFrame {
 				jobProfile.setBounds(750, 100, 119, 28);
 			}
 			{
-				jobProfileField = new JTextField("Enter job profile");
+				jobProfileField = new JTextField("");
 				getContentPane().add(jobProfileField);
 				jobProfileField.setBounds(900, 100, 119, 28);
 				jobProfileField.setEditable(false);
@@ -144,7 +146,10 @@ public class Queries extends javax.swing.JFrame {
 				{
 					qArea = new JTextArea();
 					qPane.setViewportView(qArea);
-					qArea.setText("Enter query");
+					qArea.setText("");
+					qArea.setEditable(false);
+					Color white = new Color(255,255,255);
+					qArea.setBackground(white);
 				}
 			}
 			
@@ -271,10 +276,42 @@ public class Queries extends javax.swing.JFrame {
 	}
 	
 	private PreparedStatement setPreparedStatement(int queryNum, PreparedStatement ps) throws SQLException {
-
+		int compIDInt = 0;
+		int perIDInt = 0; 
+		int jobProfileInt = 0;
+		
+		if ( compIDField.isEditable()  ) {
+			String compIDString = compIDField.getText();			
+			try {
+				compIDInt = Integer.parseInt(compIDString);
+			}
+			catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(null, "Enter valid company ID" );
+			}
+		} 
+		
+		if ( perIDField.isEditable()  ) {
+			String perIDString = perIDField.getText();			
+			try {
+				perIDInt = Integer.parseInt(perIDString);
+			}
+			catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(null, "Enter valid person ID" );
+			}
+		} 
+		
+		if ( jobProfileField.isEditable()  ) {
+			String jobProfileString = jobProfileField.getText();			
+			try {
+				jobProfileInt = Integer.parseInt(jobProfileString);
+			}
+			catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(null, "Enter valid job profile number" );
+			}
+		} 
+		
+		
 		if ( queryNum == 2 || queryNum == 3 ){
-			String compIDString = compIDField.getText();
-			int compIDInt = Integer.parseInt(compIDString);
 			ps.setInt(1, compIDInt);
 		}
 		return ps;
