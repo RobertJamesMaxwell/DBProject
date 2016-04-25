@@ -40,6 +40,40 @@ public class QueryList {
 						"ORDER BY per_id";
 			
 		}
+		
+		else if (number == 6){
+			queryText = "SELECT per_id, ks_title : " +
+						"FROM person NATURAL JOIN works NATURAL JOIN job NATURAL JOIN job_profile : " +
+						"NATURAL JOIN required_skill NATURAL JOIN knowledge_skill : " +
+						"MINUS  : " +
+						"SELECT per_id, ks_title : " +
+						"FROM person NATURAL JOIN obtained_skills NATURAL JOIN knowledge_skill";
+		}
+		
+		else if (number == 7){
+			queryText = "SELECT pos_code, ks_title, cer_code : " +
+						"FROM job_profile NATURAL JOIN required_skill NATURAL JOIN knowledge_skill FULL OUTER JOIN job_cert USING(pos_code) : " +
+						"WHERE pos_code = ? ";
+			
+		}
+		else if (number == 8){
+			queryText = "WITH skills(ks_title, kind) AS ( : " +
+						"SELECT ks_title, 'skill' : " +
+						"FROM job NATURAL JOIN job_profile NATURAL JOIN required_skill NATURAL JOIN knowledge_skill WHERE job_code = ? : " +
+						"MINUS : " +
+						"SELECT ks_title, 'skill' : " +
+						"FROM person NATURAL JOIN obtained_skills NATURAL JOIN knowledge_skill : " +
+						"WHERE per_id = ? ), : " +
+						"certificates(cer_title, kind) AS ( : " +
+						"SELECT cer_title, 'certificate' : " +
+						"FROM job NATURAL JOIN job_profile NATURAL JOIN job_cert NATURAL JOIN certificate WHERE job_code = ? : " +
+						"MINUS : " +
+						"SELECT cer_title, 'certificate' : " +
+						"FROM person NATURAL JOIN obtained_certificates NATURAL JOIN certificate : " +
+						"WHERE per_id = ? ) : " +
+						"SELECT ks_title, kind FROM skills UNION SELECT cer_title, kind from certificates";
+			
+		}
 		return queryText;
 		
 	}

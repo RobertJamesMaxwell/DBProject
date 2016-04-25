@@ -1,5 +1,6 @@
 package dbgui;
 import java.awt.Color;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
@@ -119,7 +120,7 @@ public class Queries extends javax.swing.JFrame {
 				qLabel = new JLabel();
 				getContentPane().add(qLabel);
 				qLabel.setText("Choose a Query: ");
-				qLabel.setBounds(7, 0, 91, 28);
+				qLabel.setBounds(7, 0, 120, 28);
 			}
 			{
 				String[] queryNumbers = new String[31];
@@ -131,7 +132,7 @@ public class Queries extends javax.swing.JFrame {
 				qJCombo = new JComboBox();
 				getContentPane().add(qJCombo);
 				qJCombo.setModel(qJComboModel);
-				qJCombo.setBounds(7, 28, 231, 28);
+				qJCombo.setBounds(7, 28, 181, 28);
 				qJCombo.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
 						qJComboActionPerformed(evt);
@@ -142,7 +143,7 @@ public class Queries extends javax.swing.JFrame {
 			{
 				qPane = new JScrollPane();
 				getContentPane().add(qPane);
-				qPane.setBounds(245, 0, 445, 121);
+				qPane.setBounds(35, 80, 658, 260);
 				{
 					qArea = new JTextArea();
 					qPane.setViewportView(qArea);
@@ -158,21 +159,24 @@ public class Queries extends javax.swing.JFrame {
 				message = new JTextArea();
 				getContentPane().add(message);
 				message.setText("database message");
-				message.setBounds(42, 154, 623, 84);
+				message.setBounds(750, 350, 358, 248);
+                message.setWrapStyleWord(true);
+                message.setLineWrap(true);
 			}
 			{
-				messagePane = new JScrollPane();
+				messagePane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+			            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 				getContentPane().add(messagePane);
-				messagePane.setBounds(35, 147, 658, 98);
+				messagePane.setBounds(750, 350, 358, 248);
 				messagePane.setViewportView(message);
-				message.setPreferredSize(new java.awt.Dimension(655, 95));
+				//message.setPreferredSize(new java.awt.Dimension(655, 95));
 			}
 			
 			{
 				execute = new JButton();
 				getContentPane().add(execute);
 				execute.setText("Run Query");
-				execute.setBounds(35, 595, 161, 35);
+				execute.setBounds(35, 695, 161, 35);
 				execute.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
 						executeActionPerformed(evt);
@@ -181,8 +185,9 @@ public class Queries extends javax.swing.JFrame {
 			}
 			{
 				resultPane = new JScrollPane();
+				//resultPane.setLayout(new GridBagLayout());
 				getContentPane().add(resultPane);
-				resultPane.setBounds(35, 252, 658, 329);
+				resultPane.setBounds(35, 352, 658, 329);
 				{
 					TableModel resultTableModel = new DefaultTableModel(
 						new String[][] { { "", "" }, { "", "" } },
@@ -190,12 +195,11 @@ public class Queries extends javax.swing.JFrame {
 					resultTable = new JTable();
 					resultPane.setViewportView(resultTable);
 					resultTable.setModel(resultTableModel);
-					resultTable.setPreferredSize(new java.awt.Dimension(658, 308));
 				}
 			}
 			
 			pack();
-			this.setSize(1122, 671);
+			this.setSize(1222, 771);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -229,14 +233,47 @@ public class Queries extends javax.swing.JFrame {
 
 			QueryList query = new QueryList();
 			int queryNum = qJCombo.getSelectedIndex();
+			compIDField.setText("");
+			perIDField.setText("");
+			jobProfileField.setText("");
+			qArea.setText("");
+			{
+				TableModel resultTableModel = new DefaultTableModel(
+					new String[][] { { "", "" }, { "", "" } },
+					new String[] { "", "" });
+				resultTable = new JTable();
+				resultPane.setViewportView(resultTable);
+				resultTable.setModel(resultTableModel);
+			}
 			setVariableFields(queryNum);
 
 	}
 	
-	private void setVariableFields(int queryNum){
-		if (queryNum == 2 || queryNum == 3){
-			this.compIDField.setEditable(true);
+	private void setVariableFields(int qn){
+		if (qn == 1 || qn == 4 || qn == 5 || qn == 6 )	{
+			this.compIDField.setEditable(false);
+			this.perIDField.setEditable(false);
+			this.jobProfileField.setEditable(false);
 		}
+			
+		else if (qn == 2 || qn == 3){
+			this.compIDField.setEditable(true);
+			this.perIDField.setEditable(false);
+			this.jobProfileField.setEditable(false);
+		}
+		
+		else if (qn == 7 ){
+			this.compIDField.setEditable(false);
+			this.perIDField.setEditable(false);
+			this.jobProfileField.setEditable(true);
+		}
+		
+		else if (qn == 8 ){
+			this.compIDField.setEditable(false);
+			this.perIDField.setEditable(true);
+			this.jobProfileField.setEditable(true);
+		}
+		
 		else {
 			this.compIDField.setEditable(false);
 			this.perIDField.setEditable(false);
@@ -247,9 +284,9 @@ public class Queries extends javax.swing.JFrame {
 	
 
 	
-	private void drawToScreen(int queryNum, String queryString){
+	private void drawToScreen(int qn, String queryString){
 
-		if (queryNum == 1){
+		if (qn == 1 || qn == 4 || qn ==5 || qn == 6){
 			String[] queryStringSpaced = queryString.split(":");
 			qArea.setText(queryStringSpaced[0]);
 			for (int i = 1; i < queryStringSpaced.length; i++)	{
@@ -257,9 +294,33 @@ public class Queries extends javax.swing.JFrame {
 
 			};
 		}
-		else if (queryNum == 2 || queryNum == 3) {
+		else if (qn == 2 || qn == 3) {
 			String compIDString = compIDField.getText();
 			queryString = queryString.replaceFirst("\\?", compIDString);
+			String[] queryStringSpaced = queryString.split(":");
+			qArea.setText(queryStringSpaced[0]);
+			for (int i = 1; i < queryStringSpaced.length; i++)	{
+				qArea.append(" \n" + queryStringSpaced[i]);
+
+			};
+		}
+		else if (qn == 7) {
+			String jobProfileString = jobProfileField.getText();
+			queryString = queryString.replaceFirst("\\?", jobProfileString);
+			String[] queryStringSpaced = queryString.split(":");
+			qArea.setText(queryStringSpaced[0]);
+			for (int i = 1; i < queryStringSpaced.length; i++)	{
+				qArea.append(" \n" + queryStringSpaced[i]);
+
+			};
+		}
+		else if (qn == 8) {
+			String jobProfileString = jobProfileField.getText();
+			String perIDString = perIDField.getText();
+			queryString = queryString.replaceFirst("\\?", jobProfileString);
+			queryString = queryString.replaceFirst("\\?", perIDString);
+			queryString = queryString.replaceFirst("\\?", jobProfileString);
+			queryString = queryString.replaceFirst("\\?", perIDString);
 			String[] queryStringSpaced = queryString.split(":");
 			qArea.setText(queryStringSpaced[0]);
 			for (int i = 1; i < queryStringSpaced.length; i++)	{
@@ -313,6 +374,15 @@ public class Queries extends javax.swing.JFrame {
 		
 		if ( queryNum == 2 || queryNum == 3 ){
 			ps.setInt(1, compIDInt);
+		}
+		if ( queryNum == 7 ){
+			ps.setInt(1, jobProfileInt);
+		}
+		if ( queryNum == 8 ){
+			ps.setInt(1, jobProfileInt);
+			ps.setInt(2, perIDInt);
+			ps.setInt(3, jobProfileInt);
+			ps.setInt(4, perIDInt);
 		}
 		return ps;
 	}
