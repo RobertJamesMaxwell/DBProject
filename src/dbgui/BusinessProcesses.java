@@ -29,6 +29,7 @@ import javax.swing.table.TableModel;
 import dbaccess.TableInfo;
 import tables.Person;
 import tables.Section;
+import tables.Takes;
 
 public class BusinessProcesses extends javax.swing.JFrame {
 
@@ -57,6 +58,10 @@ public class BusinessProcesses extends javax.swing.JFrame {
 	private JLabel sectionSkillLabel;
 	private JComboBox sectionCombo;
 	private JButton updatePersonBut;
+	
+	private JLabel fjPanelPersonLabel;
+	private JComboBox fjPanelPersonCombo;
+	private JTable resultTable; 
 
 
 	public BusinessProcesses(TableInfo ti)
@@ -213,7 +218,6 @@ public class BusinessProcesses extends javax.swing.JFrame {
 		
 		int returnVal = person.insert( ti.getConn() );
 		
-		//Make this a pop-up notification
 		if (returnVal == 1){
 			JOptionPane.showMessageDialog(null, "Insert Successful" );
 		}
@@ -306,8 +310,6 @@ public class BusinessProcesses extends javax.swing.JFrame {
 				updatePersonButActionPerformed(evt);
 			}
 		});
-		
-		//Do the same thing as drop down to get a list of courses
 			
 	}
 	
@@ -318,6 +320,29 @@ public class BusinessProcesses extends javax.swing.JFrame {
 		
 	}
 	private void updatePersonButActionPerformed(ActionEvent evt)	{
+		
+		int perID = pIDCombo.getSelectedIndex();
+		String courseSection = (String) sectionCombo.getItemAt(sectionCombo.getSelectedIndex());
+		String[] courseSectionSplit = courseSection.split("\\|");
+		for ( int i = 0; i < courseSectionSplit.length; i++ ) {
+			courseSectionSplit[i] = courseSectionSplit[i].trim();
+		}
+		Takes takes = new Takes();
+		
+		takes.setPerID( perID );
+		takes.setcCode( courseSectionSplit[0] );
+		takes.setSecNo( Integer.parseInt( courseSectionSplit[1] ) );
+		takes.setSemester( courseSectionSplit[2] );
+		takes.setYear( Integer.parseInt( courseSectionSplit[3] ) );
+		
+		int returnVal = takes.insert( ti.getConn() );
+		
+		if (returnVal == 1){
+			JOptionPane.showMessageDialog(null, "Update Successful" );
+		}
+		else {
+			JOptionPane.showMessageDialog(null, "Update Not Successful" );
+		}
 		
 	}
 	
@@ -330,15 +355,87 @@ public class BusinessProcesses extends javax.swing.JFrame {
 	public void createFindJobPanel()
 	{
 		findJobPanel = new JPanel();
-		findJobPanel.setLayout( new GridLayout( 3, 2 ) );
+		findJobPanel.setLayout( null );
 
-		findJobPanel.add( new JLabel( "Field 1:" ) );
-		findJobPanel.add( new TextArea() );
-		findJobPanel.add( new JLabel( "Field 2:" ) );
-		findJobPanel.add( new TextArea() );
-		findJobPanel.add( new JLabel( "Field 3:" ) );
-		findJobPanel.add( new TextArea() );
+		{
+			fjPanelPersonLabel = new JLabel();
+			findJobPanel.add(fjPanelPersonLabel);
+			fjPanelPersonLabel.setText("Select a person ID: ");
+			fjPanelPersonLabel.setBounds(7, 10, 120, 28);
+		}
+		{
+			int numPeople = new Person().getCount( ti.getConn() );
+			String[] perIDs = new String[ numPeople + 1 ];
+			perIDs[0] = "Select Person ID";
+			for (int i = 1; i < perIDs.length; i++)	{
+				perIDs[i] = "" + i;
+			}
+			ComboBoxModel fjPanelPersonModel = new DefaultComboBoxModel(perIDs);
+			fjPanelPersonCombo = new JComboBox();
+			findJobPanel.add(fjPanelPersonCombo);
+			fjPanelPersonCombo.setModel(fjPanelPersonModel);
+			fjPanelPersonCombo.setBounds(7, 30, 181, 28);
+			fjPanelPersonCombo.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					fjPanelPersonComboActionPerformed(evt);
+				}
+			});
+		}
+		{
+			JLabel fjResultPaneLabel = new JLabel();
+			findJobPanel.add(fjResultPaneLabel);
+			fjResultPaneLabel.setText("Person is qualified for the following jobs: ");
+			fjResultPaneLabel.setBounds(35, 322, 320, 28);
+		}
+		{
+			JScrollPane resultPane = new JScrollPane();
+			findJobPanel.add(resultPane);
+			resultPane.setBounds(35, 352, 658, 329);
+			{
+				TableModel resultTableModel = new DefaultTableModel(
+					new String[][] { { "", "" }, { "", "" } },
+					new String[] { "", "" });
+				resultTable = new JTable();
+				resultPane.setViewportView(resultTable);
+				resultTable.setModel(resultTableModel);
+			}
+		}
+		
+				
 	}
+	
+	protected void fjPanelPersonComboActionPerformed(ActionEvent evt) {
+		
+		int perID = fjPanelPersonCombo.getSelectedIndex();
+		
+		//Update psString to pull from Query 15 in QueryList
+		String psString = "SELECT J.pos_code, J.job_title FROM job_profile J " +
+						  "WHERE NOT EXISTS ( " +
+						  "SELECT ks_code FROM required_skill " +
+						  "WHERE J.pos_code = pos_code " +
+						  "MINUS " +
+						  "SELECT ks_code FROM obtained_skills " +
+						  "WHERE per_id = ? ) "; 
+		
+		try {
+			ps = ti.getConn().prepareStatement(psString);
+			ps.setInt(1, perID);;
+
+			java.sql.ResultSet rs = ps.executeQuery();
+			TableModel tableModel = new DefaultTableModel(ti.resultSet2Vector(rs), ti.getTitlesAsVector(rs));
+			resultTable.setModel(tableModel);
+		
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+			JOptionPane.showMessageDialog(null, sqle.getMessage() );
+		}
+		
+		
+	}
+
+	/****************************
+	 * FIND A WORKER
+	 *******************************/
 	
 	public void createFindWorkerPanel()
 	{

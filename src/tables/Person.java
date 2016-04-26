@@ -121,8 +121,6 @@ public class Person {
 			while (rs.next()) {
 			    count++;
 			}
-			//rs.last();
-			System.out.println(count);
 			return count;
 				
 			

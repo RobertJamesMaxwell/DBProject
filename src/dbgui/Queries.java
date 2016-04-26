@@ -148,7 +148,7 @@ public class Queries extends javax.swing.JFrame {
 					qArea = new JTextArea();
 					qPane.setViewportView(qArea);
 					qArea.setText("");
-					//qArea.setEditable(false);
+					qArea.setEditable(false);
 					Color white = new Color(255,255,255);
 					qArea.setBackground(white);
 				}

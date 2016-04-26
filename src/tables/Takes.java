@@ -8,12 +8,16 @@ import javax.swing.JOptionPane;
 
 public class Takes {
 	
-	Takes(Person person, Section section){
+	public Takes(Person person, Section section){
 		setPerID(person.getPerID());
 		setcCode(section.getcCode());
 		setSecNo(section.getSecNo());
 		setSemester(section.getSemester());
 		setYear(section.getYear());
+	}
+	
+	public Takes() {
+		
 	}
 	
 	final String addTakesString = "INSERT INTO takes VALUES(?, ?, ?, ?, ?)";
