@@ -2,6 +2,7 @@ package tables;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
@@ -9,6 +10,7 @@ import javax.swing.JOptionPane;
 public class Person {
 
 	final String addPersonString = "INSERT INTO person VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	final String getPersonCount = "SELECT * FROM person";
 	
 	private PreparedStatement ps;
 	
@@ -28,48 +30,56 @@ public class Person {
 	public void setPerID(int perID) {
 		this.perID = perID;
 	}
+	
 	public String getFirstName() {
 		return firstName;
 	}
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
+	
 	public String getLastName() {
 		return lastName;
 	}
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
+	
 	public int getStreetNumber() {
 		return streetNumber;
 	}
 	public void setStreetNumber(int streetNumber) {
 		this.streetNumber = streetNumber;
 	}
+	
 	public String getStreetName() {
 		return streetName;
 	}
 	public void setStreetName(String streetName) {
 		this.streetName = streetName;
 	}
+	
 	public String getCity() {
 		return city;
 	}
 	public void setCity(String city) {
 		this.city = city;
 	}
+	
 	public String getState() {
 		return state;
 	}
 	public void setState(String state) {
 		this.state = state;
 	}
+	
 	public int getZip() {
 		return zip;
 	}
 	public void setZip(int zip) {
 		this.zip = zip;
 	}
+	
 	public String getEmail() {
 		return email;
 	}
@@ -92,6 +102,28 @@ public class Person {
 			ps.setInt(8, this.zip );
 			ps.setString(9, this.email );
 			return ps.executeUpdate();
+				
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e.getMessage() );
+			return -1;
+		}
+		
+	}
+	
+	public int getCount( Connection conn ){
+		
+		try {
+			ps = conn.prepareStatement(getPersonCount);
+			ResultSet rs = ps.executeQuery();
+			int count = 0;
+			while (rs.next()) {
+			    count++;
+			}
+			//rs.last();
+			System.out.println(count);
+			return count;
 				
 			
 		} catch (SQLException e) {

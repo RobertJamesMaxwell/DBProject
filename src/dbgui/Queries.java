@@ -78,12 +78,12 @@ public class Queries extends javax.swing.JFrame {
 				compID = new JLabel();
 				getContentPane().add(compID);
 				compID.setText("Set comp_id: ");
-				compID.setBounds(750, 0, 119, 28);
+				compID.setBounds(750, 10, 119, 28);
 			}
 			{
 				compIDField = new JTextField("");
 				getContentPane().add(compIDField);
-				compIDField.setBounds(900, 0, 119, 28);
+				compIDField.setBounds(900, 10, 119, 28);
 				compIDField.setEditable(false);
 			}
 			
@@ -92,12 +92,12 @@ public class Queries extends javax.swing.JFrame {
 				perID = new JLabel();
 				getContentPane().add(perID);
 				perID.setText("Set per_id: ");
-				perID.setBounds(750, 50, 119, 28);
+				perID.setBounds(750, 60, 119, 28);
 			}
 			{
 				perIDField = new JTextField("");
 				getContentPane().add(perIDField);
-				perIDField.setBounds(900, 50, 119, 28);
+				perIDField.setBounds(900, 60, 119, 28);
 				perIDField.setEditable(false);
 			}
 			
@@ -106,12 +106,12 @@ public class Queries extends javax.swing.JFrame {
 				jobProfile = new JLabel();
 				getContentPane().add(jobProfile);
 				jobProfile.setText("Set job_profile: ");
-				jobProfile.setBounds(750, 100, 119, 28);
+				jobProfile.setBounds(750, 110, 119, 28);
 			}
 			{
 				jobProfileField = new JTextField("");
 				getContentPane().add(jobProfileField);
-				jobProfileField.setBounds(900, 100, 119, 28);
+				jobProfileField.setBounds(900, 110, 119, 28);
 				jobProfileField.setEditable(false);
 			}
 			
@@ -148,7 +148,7 @@ public class Queries extends javax.swing.JFrame {
 					qArea = new JTextArea();
 					qPane.setViewportView(qArea);
 					qArea.setText("");
-					qArea.setEditable(false);
+					//qArea.setEditable(false);
 					Color white = new Color(255,255,255);
 					qArea.setBackground(white);
 				}

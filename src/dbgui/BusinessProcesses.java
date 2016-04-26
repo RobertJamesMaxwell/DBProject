@@ -11,7 +11,9 @@ import java.sql.SQLException;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
@@ -47,6 +49,10 @@ public class BusinessProcesses extends javax.swing.JFrame {
 	private JTextField zipField;
 	private JTextField eField;
 	private JTextField pField;
+	
+	private JLabel perIDSkillLabel;
+	private JComboBox pIDCombo;
+	private JButton updatePersonBut;
 
 
 	public BusinessProcesses(TableInfo ti)
@@ -189,7 +195,8 @@ public class BusinessProcesses extends javax.swing.JFrame {
 	
 	private void addPersonButActionPerformed(ActionEvent evt) {
 		
-		Person person = new Person( );
+		Person person = new Person();
+		
 		person.setPerID( Integer.parseInt( pIDField.getText() ));
 		person.setFirstName( fnField.getText() );
 		person.setLastName( lnField.getText() );
@@ -204,41 +211,13 @@ public class BusinessProcesses extends javax.swing.JFrame {
 		
 		//Make this a pop-up notification
 		if (returnVal == 1){
-			System.out.println("Insert Successful");
+			JOptionPane.showMessageDialog(null, "Insert Successful" );
+		}
+		else {
+			JOptionPane.showMessageDialog(null, "Insert Not Successful" );
 		}
 		
-		
-		//String addPersonString = "INSERT INTO person VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	/*	
-		
-		try {
-			ps = ti.getConn().prepareStatement(addPersonString);
-			ps.setInt(1, Integer.parseInt( pIDField.getText() ) );
-			ps.setString(2, fnField.getText() );
-			ps.setString(3, lnField.getText() );
-			ps.setInt(4, Integer.parseInt( sNumField.getText() ) );
-			ps.setString(5, snField.getText() );
-			ps.setString(6, cityField.getText() );
-			ps.setString(7, stField.getText() );
-			ps.setInt(8, Integer.parseInt( zipField.getText() ) );
-			ps.setString(9, eField.getText() );
-			int returnVal = ps.executeUpdate();
-			
-			//Make this a pop-up notification
-			if (returnVal == 1){
-				System.out.println("Insert Successful");
-			}
-			
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		*/
 	}
-	
-	
-	
 	
 	
 	
@@ -247,14 +226,60 @@ public class BusinessProcesses extends javax.swing.JFrame {
 	public void createSkillPanel()
 	{
 		skillPanel = new JPanel();
-		skillPanel.setLayout( new BorderLayout() );
+		skillPanel.setLayout( null );
 
-		skillPanel.add( new JButton( "North" ), BorderLayout.NORTH );
-		skillPanel.add( new JButton( "South" ), BorderLayout.SOUTH );
-		skillPanel.add( new JButton( "East" ), BorderLayout.EAST );
-		skillPanel.add( new JButton( "West" ), BorderLayout.WEST );
-		skillPanel.add( new JButton( "Center" ), BorderLayout.CENTER );
+		{
+			perIDSkillLabel = new JLabel();
+			skillPanel.add(perIDSkillLabel);
+			perIDSkillLabel.setText("Select a person ID: ");
+			perIDSkillLabel.setBounds(7, 0, 120, 28);
+		}
+		{
+			int numPeople = new Person().getCount( ti.getConn() );
+			String[] perIDs = new String[ numPeople + 1 ];
+			perIDs[0] = "Select Person ID";
+			for (int i = 1; i < perIDs.length; i++)	{
+				perIDs[i] = "" + i;
+			}
+			ComboBoxModel perIDComboModel = new DefaultComboBoxModel(perIDs);
+			pIDCombo = new JComboBox();
+			skillPanel.add(pIDCombo);
+			pIDCombo.setModel(perIDComboModel);
+			pIDCombo.setBounds(7, 28, 181, 28);
+			pIDCombo.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					pIDComboActionPerformed(evt);
+				}
+			});
+		}
+		updatePersonBut = new JButton();
+		skillPanel.add(updatePersonBut);
+		updatePersonBut.setText("Update person's course");
+		updatePersonBut.setBounds(10, 480, 250, 40);
+		updatePersonBut.setEnabled(true);
+		updatePersonBut.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				updatePersonButActionPerformed(evt);
+			}
+		});
+		
+		//Do the same thing as drop down to get a list of courses
+			
 	}
+	
+	private void pIDComboActionPerformed(ActionEvent evt)	{
+		
+	}
+	
+	private void updatePersonButActionPerformed(ActionEvent evt)	{
+		
+	}
+	
+	
+	
+	/****************************
+	 * FIND A JOB
+	 *******************************/
 
 	public void createFindJobPanel()
 	{
