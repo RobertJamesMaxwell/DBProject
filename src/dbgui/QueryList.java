@@ -83,6 +83,13 @@ public class QueryList {
 						"SELECT ks_code, cer_code FROM course_skill NATURAL JOIN course FULL OUTER JOIN requires USING(c_code) : " +
 						"WHERE C.c_code = c_code";
 		}
+		else if (number == 26) {
+			queryText = "SELECT sector_name, COUNT(sector_name) as job_count: " +
+						"FROM sector NATURAL JOIN company NATURAL JOIN job NATURAL JOIN job_profile: " +
+						"GROUP BY sector_name: " +
+						"ORDER BY job_count";
+		}
+		
 		return queryText;
 		
 	}

@@ -63,6 +63,8 @@ public class BusinessProcesses extends javax.swing.JFrame {
 	private JLabel fjPanelPersonLabel;
 	private JComboBox fjPanelPersonCombo;
 	private JTable resultTable; 
+	private JTable fjresultTable; 
+	private JTable fwresultTable;
 	
 	private JComboBox fwPanelJobProfileCombo;
 
@@ -395,12 +397,12 @@ public class BusinessProcesses extends javax.swing.JFrame {
 			findJobPanel.add(resultPane);
 			resultPane.setBounds(35, 352, 658, 329);
 			{
-				TableModel resultTableModel = new DefaultTableModel(
+				TableModel fjresultTableModel = new DefaultTableModel(
 					new String[][] { { "", "" }, { "", "" } },
 					new String[] { "", "" });
-				resultTable = new JTable();
-				resultPane.setViewportView(resultTable);
-				resultTable.setModel(resultTableModel);
+				fjresultTable = new JTable();
+				resultPane.setViewportView(fjresultTable);
+				fjresultTable.setModel(fjresultTableModel);
 			}
 		}
 		
@@ -426,7 +428,7 @@ public class BusinessProcesses extends javax.swing.JFrame {
 
 			java.sql.ResultSet rs = ps.executeQuery();
 			TableModel tableModel = new DefaultTableModel(ti.resultSet2Vector(rs), ti.getTitlesAsVector(rs));
-			resultTable.setModel(tableModel);
+			fjresultTable.setModel(tableModel);
 		
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
@@ -481,12 +483,12 @@ public class BusinessProcesses extends javax.swing.JFrame {
 			findWorkerPanel.add(resultPane);
 			resultPane.setBounds(35, 352, 658, 329);
 			{
-				TableModel resultTableModel = new DefaultTableModel(
+				TableModel fwresultTableModel = new DefaultTableModel(
 					new String[][] { { "", "" }, { "", "" } },
 					new String[] { "", "" });
-				resultTable = new JTable();
-				resultPane.setViewportView(resultTable);
-				resultTable.setModel(resultTableModel);
+				fwresultTable = new JTable();
+				resultPane.setViewportView(fwresultTable);
+				fwresultTable.setModel(fwresultTableModel);
 			}
 		}
 		
@@ -529,7 +531,7 @@ public class BusinessProcesses extends javax.swing.JFrame {
 
 			java.sql.ResultSet rs = ps.executeQuery();
 			TableModel tableModel = new DefaultTableModel(ti.resultSet2Vector(rs), ti.getTitlesAsVector(rs));
-			resultTable.setModel(tableModel);
+			fwresultTable.setModel(tableModel);
 		
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
@@ -546,9 +548,48 @@ public class BusinessProcesses extends javax.swing.JFrame {
 	public void createSectorPanel()
 	{
 		sectorPanel = new JPanel();
-		sectorPanel.setLayout( new GridLayout( 3, 2 ) );
+		sectorPanel.setLayout( null );
+
+		{
+			JLabel sectorResultPaneLabel = new JLabel();
+			sectorPanel.add(sectorResultPaneLabel);
+			sectorResultPaneLabel.setText("Job distribution by sector: ");
+			sectorResultPaneLabel.setBounds(35, 322, 320, 28);
+		}
+		{
+			JScrollPane resultPane = new JScrollPane();
+			sectorPanel.add(resultPane);
+			resultPane.setBounds(35, 352, 658, 329);
+			{
+				TableModel resultTableModel = new DefaultTableModel(
+					new String[][] { { "", "" }, { "", "" } },
+					new String[] { "", "" });
+				resultTable = new JTable();
+				resultPane.setViewportView(resultTable);
+				resultTable.setModel(resultTableModel);
+			}
+		}
+		
+		QueryList query = new QueryList();
+		String queryString = query.getQuery(26);
+		queryString = queryString.replaceAll(":", "");
+			
+
+		try {
+			ps = ti.getConn().prepareStatement(queryString);
+
+			java.sql.ResultSet rs = ps.executeQuery();
+			TableModel tableModel = new DefaultTableModel(ti.resultSet2Vector(rs), ti.getTitlesAsVector(rs));
+			resultTable.setModel(tableModel);
+		
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+			JOptionPane.showMessageDialog(null, sqle.getMessage() );
+		}
+		
 
 	}
+
 
 
 	
