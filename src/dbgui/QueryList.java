@@ -74,6 +74,15 @@ public class QueryList {
 						"SELECT ks_title, kind FROM skills UNION SELECT cer_title, kind from certificates";
 			
 		}
+		else if (number == 9) {
+			queryText = "SELECT C.c_code FROM course C : " +
+						"WHERE NOT EXISTS ( : " +
+						"SELECT ks_code, cer_code FROM required_skill NATURAL JOIN job_profile FULL OUTER JOIN job_cert USING(pos_code) : " +
+						"WHERE pos_code = ? : " +
+						"MINUS : " +
+						"SELECT ks_code, cer_code FROM course_skill NATURAL JOIN course FULL OUTER JOIN requires USING(c_code) : " +
+						"WHERE C.c_code = c_code";
+		}
 		return queryText;
 		
 	}
