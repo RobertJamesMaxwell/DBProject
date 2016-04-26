@@ -27,6 +27,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import dbaccess.TableInfo;
+import tables.JobProfile;
 import tables.Person;
 import tables.Section;
 import tables.Takes;
@@ -62,6 +63,8 @@ public class BusinessProcesses extends javax.swing.JFrame {
 	private JLabel fjPanelPersonLabel;
 	private JComboBox fjPanelPersonCombo;
 	private JTable resultTable; 
+	
+	private JComboBox fwPanelJobProfileCombo;
 
 
 	public BusinessProcesses(TableInfo ti)
@@ -440,12 +443,105 @@ public class BusinessProcesses extends javax.swing.JFrame {
 	public void createFindWorkerPanel()
 	{
 		findWorkerPanel = new JPanel();
-		findWorkerPanel.setLayout( new GridLayout( 3, 2 ) );
+		findWorkerPanel.setLayout( null );
 
-		findWorkerPanel.add( new JLabel( "Worker INFO 1:" ) );
-		findWorkerPanel.add( new TextArea() );
+		{
+			JLabel fwPanelJobLabel = new JLabel();
+			findWorkerPanel.add(fwPanelJobLabel);
+			fwPanelJobLabel.setText("Select a job profile: ");
+			fwPanelJobLabel.setBounds(7, 10, 120, 28);
+		}
+		{
+			int numJobProfiles = new JobProfile().getCount( ti.getConn() );
+			String[] jobProfiles = new String[ numJobProfiles + 1 ];
+			jobProfiles[0] = "Select Job Profile";
+			for (int i = 1; i < jobProfiles.length; i++)	{
+				jobProfiles[i] = "" + i;
+			}
+			
+			ComboBoxModel fwPanelJobProfileModel = new DefaultComboBoxModel(jobProfiles);
+			fwPanelJobProfileCombo = new JComboBox();
+			findWorkerPanel.add(fwPanelJobProfileCombo);
+			fwPanelJobProfileCombo.setModel(fwPanelJobProfileModel);
+			fwPanelJobProfileCombo.setBounds(7, 30, 181, 28);
+			fwPanelJobProfileCombo.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					fwPanelJobProfileComboActionPerformed(evt);
+				}
+			});
+		}
+		{
+			JLabel fjResultPaneLabel = new JLabel();
+			findWorkerPanel.add(fjResultPaneLabel);
+			fjResultPaneLabel.setText("The following people are qualified for that job profile: ");
+			fjResultPaneLabel.setBounds(35, 322, 320, 28);
+		}
+		{
+			JScrollPane resultPane = new JScrollPane();
+			findWorkerPanel.add(resultPane);
+			resultPane.setBounds(35, 352, 658, 329);
+			{
+				TableModel resultTableModel = new DefaultTableModel(
+					new String[][] { { "", "" }, { "", "" } },
+					new String[] { "", "" });
+				resultTable = new JTable();
+				resultPane.setViewportView(resultTable);
+				resultTable.setModel(resultTableModel);
+			}
+		}
+		
+				
+	}
+	
+	protected void fwPanelJobProfileComboActionPerformed(ActionEvent evt) {
+		
+		int posCode = fwPanelJobProfileCombo.getSelectedIndex();
+		
+		//Update psString to pull from Query 17 in QueryList
+		String psString = "WITH q_by_skill(per_id, per_first_name, per_last_name, per_email) AS ( " +
+						  "SELECT P.per_id, per_first_name, per_last_name, per_email FROM person P " +
+						  "WHERE NOT EXISTS ( " +
+						  "SELECT ks_code FROM required_skill " +
+						  "WHERE pos_code = ?  " +
+						  "MINUS " +
+						  "SELECT ks_code FROM obtained_skills " +
+						  "WHERE P.per_id = per_id " +
+						  ")), " +
+						  "q_by_cert(per_id, per_first_name, per_last_name, per_email) AS ( " +
+						  "SELECT P.per_id, per_first_name, per_last_name, per_email FROM person P " +
+						  "WHERE NOT EXISTS ( " +
+						  "SELECT cer_code FROM job_cert " +
+						  "WHERE pos_code = ? " +
+						  "MINUS " +
+						  "SELECT cer_code FROM obtained_certificates " +
+						  "WHERE P.per_id = per_id " +
+						  ")) " +
+						  "SELECT per_id, per_first_name, per_last_name, per_email " +
+						  "FROM q_by_skill " +
+						  "INTERSECT " +
+						  "SELECT per_id, per_first_name, per_last_name, per_email " +
+						  "FROM q_by_cert";
+
+		try {
+			ps = ti.getConn().prepareStatement(psString);
+			ps.setInt(1, posCode);
+			ps.setInt(2, posCode);
+
+			java.sql.ResultSet rs = ps.executeQuery();
+			TableModel tableModel = new DefaultTableModel(ti.resultSet2Vector(rs), ti.getTitlesAsVector(rs));
+			resultTable.setModel(tableModel);
+		
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+			JOptionPane.showMessageDialog(null, sqle.getMessage() );
+		}
+		
 
 	}
+	
+	/****************************
+	 * EXPLORE A SECTOR
+	 *******************************/
 	
 	public void createSectorPanel()
 	{
