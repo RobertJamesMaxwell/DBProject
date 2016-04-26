@@ -2,13 +2,17 @@ package tables;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
 public class Section {
 	
 	final String addSectionString = "INSERT INTO section VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	final String getCourseList = "SELECT c_code, sec_no, semester, year FROM section";
 	private PreparedStatement ps;
 	
 	private String cCode;
@@ -114,6 +118,32 @@ public class Section {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e.getMessage() );
 			return -1;
+		}
+		
+	}
+	
+	public ArrayList getList( Connection conn ){
+		ArrayList courseList = new ArrayList();
+		
+		try {
+			ps = conn.prepareStatement(getCourseList);
+			ResultSet rs = ps.executeQuery();
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int colCount = rsmd.getColumnCount();
+
+			while (rs.next() == true)	{
+			    for (int i = 1; i <= colCount; i++) {
+			        courseList.add( rs.getString(i) ); // Or even rs.getObject()
+			    }	
+			};
+			
+			return courseList;
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e.getMessage() );
+			return courseList;
 		}
 		
 	}

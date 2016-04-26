@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -27,6 +28,7 @@ import javax.swing.table.TableModel;
 
 import dbaccess.TableInfo;
 import tables.Person;
+import tables.Section;
 
 public class BusinessProcesses extends javax.swing.JFrame {
 
@@ -52,6 +54,8 @@ public class BusinessProcesses extends javax.swing.JFrame {
 	
 	private JLabel perIDSkillLabel;
 	private JComboBox pIDCombo;
+	private JLabel sectionSkillLabel;
+	private JComboBox sectionCombo;
 	private JButton updatePersonBut;
 
 
@@ -232,7 +236,7 @@ public class BusinessProcesses extends javax.swing.JFrame {
 			perIDSkillLabel = new JLabel();
 			skillPanel.add(perIDSkillLabel);
 			perIDSkillLabel.setText("Select a person ID: ");
-			perIDSkillLabel.setBounds(7, 0, 120, 28);
+			perIDSkillLabel.setBounds(7, 10, 120, 28);
 		}
 		{
 			int numPeople = new Person().getCount( ti.getConn() );
@@ -245,13 +249,53 @@ public class BusinessProcesses extends javax.swing.JFrame {
 			pIDCombo = new JComboBox();
 			skillPanel.add(pIDCombo);
 			pIDCombo.setModel(perIDComboModel);
-			pIDCombo.setBounds(7, 28, 181, 28);
+			pIDCombo.setBounds(7, 30, 181, 28);
 			pIDCombo.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
 					pIDComboActionPerformed(evt);
 				}
 			});
 		}
+		//Course Section list
+		{
+			sectionSkillLabel = new JLabel();
+			skillPanel.add(sectionSkillLabel);
+			sectionSkillLabel.setText("Select a course section: ");
+			sectionSkillLabel.setBounds(7, 60, 120, 28);
+		}
+		{
+			ArrayList courseList = new Section().getList( ti.getConn() );
+			String[] courses = new String[ (courseList.size() / 4) + 1 ];
+			courses[0] = "Select Course Section";
+			
+			int counter = 1;
+			String course = "";
+			for (int i = 1; i <= courseList.size(); i++ ) {
+				
+
+				course = course + courseList.get(i - 1) + " | ";
+				if ((i) % 4 == 0) {	
+					StringBuilder builder = new StringBuilder(course);
+					builder.replace(course.lastIndexOf("|"), course.lastIndexOf("|") + 1, "" );
+					course = builder.toString();
+					courses [counter] = course;
+					course = "";
+					counter++;
+				}
+			}
+			
+			ComboBoxModel sectionComboModel = new DefaultComboBoxModel(courses);
+			sectionCombo = new JComboBox();
+			skillPanel.add(sectionCombo);
+			sectionCombo.setModel(sectionComboModel);
+			sectionCombo.setBounds(7, 80, 181, 28);
+			sectionCombo.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					sectionComboActionPerformed(evt);
+				}
+			});
+		}
+		
 		updatePersonBut = new JButton();
 		skillPanel.add(updatePersonBut);
 		updatePersonBut.setText("Update person's course");
@@ -270,7 +314,9 @@ public class BusinessProcesses extends javax.swing.JFrame {
 	private void pIDComboActionPerformed(ActionEvent evt)	{
 		
 	}
-	
+	private void sectionComboActionPerformed(ActionEvent evt)	{
+		
+	}
 	private void updatePersonButActionPerformed(ActionEvent evt)	{
 		
 	}
