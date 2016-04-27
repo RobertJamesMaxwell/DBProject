@@ -5,6 +5,8 @@ import java.awt.GridLayout;
 import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -64,10 +66,13 @@ public class BusinessProcesses extends javax.swing.JFrame {
 	private JLabel fjPanelPersonLabel;
 	private JComboBox fjPanelPersonCombo;
 	private JTable resultTable; 
-	private JTable fjresultTable; 
-	private JTable fwresultTable;
+	private JTable fjresultTable;
+	private JButton addPersonJobBut;
 	
+	private JTable fwresultTable;
 	private JComboBox fwPanelJobProfileCombo;
+	
+	private java.sql.ResultSet fjrs;
 
 
 	public BusinessProcesses(TableInfo ti)
@@ -92,7 +97,7 @@ public class BusinessProcesses extends javax.swing.JFrame {
 		// Create a tabbed pane
 		tabbedPane = new JTabbedPane();
 		tabbedPane.addTab( "Add person", personPanel );
-		tabbedPane.addTab( "Add person skills", skillPanel );
+		tabbedPane.addTab( "Add person's courses", skillPanel );
 		tabbedPane.addTab( "Find a Job", findJobPanel );
 		tabbedPane.addTab( "Find a Job Candidate", findWorkerPanel );
 		tabbedPane.addTab( "Explore Job Sector Opportunities", sectorPanel );
@@ -483,7 +488,37 @@ public class BusinessProcesses extends javax.swing.JFrame {
 			}
 		}
 		
+		addPersonJobBut = new JButton();
+		findJobPanel.add(addPersonJobBut);
+		addPersonJobBut.setText("Add person to this job");
+		addPersonJobBut.setBounds(10, 710, 250, 40);
+		addPersonJobBut.setEnabled(true);
+		addPersonJobBut.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				addPersonJobButActionPerformed(evt);
+			}
+		});
+		
 				
+	}
+	
+	private void addPersonJobButActionPerformed(ActionEvent evt) {
+		int rowSelection = fjresultTable.getSelectedRow();
+		try {
+			fjrs.first();
+			for ( int i = 0; i < rowSelection; i++ ){
+				fjrs.next();
+			}
+			int jobCode = fjrs.getInt(1);
+			System.out.println(jobCode);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		int perID = fjPanelPersonCombo.getSelectedIndex();
+		Works works = new Works( perID, jobCode );
+		
 	}
 	
 	protected void fjPanelPersonComboActionPerformed(ActionEvent evt) {
@@ -500,13 +535,27 @@ public class BusinessProcesses extends javax.swing.JFrame {
 						  "WHERE per_id = ? ) "; 
 		
 		try {
-			ps = ti.getConn().prepareStatement(psString);
+			ps = ti.getConn().prepareStatement(psString,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			ps.setInt(1, perID);;
 
-			java.sql.ResultSet rs = ps.executeQuery();
-			TableModel tableModel = new DefaultTableModel(ti.resultSet2Vector(rs), ti.getTitlesAsVector(rs));
+			fjrs = ps.executeQuery();
+			TableModel tableModel = new DefaultTableModel(ti.resultSet2Vector(fjrs), ti.getTitlesAsVector(fjrs));
 			fjresultTable.setModel(tableModel);
-		
+			
+			//Add table mouse listener
+	/*		MouseListener tableMouseListener = new MouseAdapter()  {
+				
+				public void mouseClicked(MouseEvent e) {
+					
+				}
+				
+			}
+			fjresultTable.addMouseListener(tableMouseListener);
+			int x = fjresultTable.getSelectedRow();
+			System.out.println(x);
+			
+	*/
+			
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 			JOptionPane.showMessageDialog(null, sqle.getMessage() );
