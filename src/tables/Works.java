@@ -22,6 +22,13 @@ public class Works {
 		setEndDate(endDate);
 	}
 	
+	public Works(int perID, int jobCode, String startDate, String endDate){
+		setPerID(perID);
+		setJobCode(jobCode);
+		setStartDate(startDate);
+		setEndDate(endDate);
+	}
+	
 	final String addWorksString = "INSERT INTO takes VALUES(?, ?, ?, ?)";
 	private PreparedStatement ps;
 	
