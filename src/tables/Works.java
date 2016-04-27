@@ -11,8 +11,8 @@ public class Works {
 	public Works(Person person, Job job){
 		setPerID(person.getPerID());
 		setJobCode(job.getJobCode());
-		setStartDate(null);
-		setEndDate(null); 
+		setStartDate("null");
+		setEndDate("null"); 
 	}
 	
 	public Works(Person person, Job job, String startDate, String endDate){
@@ -29,7 +29,7 @@ public class Works {
 		setEndDate(endDate);
 	}
 	
-	final String addWorksString = "INSERT INTO takes VALUES(?, ?, ?, ?)";
+	final String addWorksString = "INSERT INTO works VALUES(?, ?, ?, ?)";
 	private PreparedStatement ps;
 	
 	private int perID;
