@@ -12,7 +12,7 @@ public class Works {
 		setPerID(person.getPerID());
 		setJobCode(job.getJobCode());
 		setStartDate(null);
-		setEndDate(null);
+		setEndDate(null); 
 	}
 	
 	public Works(Person person, Job job, String startDate, String endDate){
