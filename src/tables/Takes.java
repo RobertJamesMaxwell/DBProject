@@ -84,7 +84,12 @@ public class Takes {
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, e.getMessage() );
+			CharSequence error = "ORA-00001";
+			if ( e.getMessage().contains(error) ){
+				JOptionPane.showMessageDialog(null, "This row already exists");
+			}
+					
+			//JOptionPane.showMessageDialog(null, e.getMessage() );
 			return -1;
 		}
 		

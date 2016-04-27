@@ -344,11 +344,15 @@ public class BusinessProcesses extends javax.swing.JFrame {
 		int returnVal = takes.insert( ti.getConn() );
 		
 		//Get skills for that course
-		String getSkillsForGivenCourse = "SELECT ks_code FROM course_skill WHERE c_code = 'wd1'";
+		String getSkillsForGivenCourse = "SELECT ks_code FROM course_skill WHERE c_code = ? ";
 		ArrayList skillsList = new ArrayList();
 		try {
 			PreparedStatement ps = ti.getConn().prepareStatement(getSkillsForGivenCourse);
+			ps.setString(1, courseSectionSplit[0] );
 			ResultSet rs = ps.executeQuery();
+			
+		//	rs.getWarnings();
+			
 			while (rs.next() == true)	{
 			        skillsList.add( rs.getInt(1) ); // Or even rs.getObject()
 			};
@@ -370,6 +374,10 @@ public class BusinessProcesses extends javax.swing.JFrame {
 				ps.setInt(2,  (int) skillsList.get(i));
 				resultOfSkillInsert = ps.executeUpdate();
 				
+				if (resultOfSkillInsert == 0) {
+					JOptionPane.showMessageDialog(null, ps.getWarnings() );
+				}
+				
 			
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -377,21 +385,22 @@ public class BusinessProcesses extends javax.swing.JFrame {
 		}
 		
 		//Get certs for that course
-		String getCertsForGivenCourse = "SELECT cer_code FROM requires WHERE c_code = 'wd1'";
+		String getCertsForGivenCourse = "SELECT cer_code FROM requires WHERE c_code = ? ";
 		ArrayList<String> certsList = new ArrayList<String>();
 		try {
 			PreparedStatement ps = ti.getConn().prepareStatement(getCertsForGivenCourse);
+			ps.setString(1, courseSectionSplit[0] );
 			ResultSet rs = ps.executeQuery();
 			while (rs.next() == true)	{
 			        certsList.add( rs.getString(1) ); // Or even rs.getObject()
 			};
-			System.out.println(skillsList.toString());
+			System.out.println(certsList.toString());
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
-		//Update person's skills from skillList
+		//Update person's certs from certsList
 		String updatePersonCerts = "";
 		int resultOfCertInsert = 0;
 		for (int i = 0; i < certsList.size(); i++){
@@ -410,11 +419,11 @@ public class BusinessProcesses extends javax.swing.JFrame {
 		
 
 		
-		if (returnVal == 1 && resultOfSkillInsert == 1){
+		if (returnVal == 1 && resultOfSkillInsert == 1 && resultOfCertInsert == 1){
 			JOptionPane.showMessageDialog(null, "Update Successful" );
 		}
 		else {
-			JOptionPane.showMessageDialog(null, "Update Not Successful" );
+			//JOptionPane.showMessageDialog(null, "Update Not Successful" );
 		}
 		
 	}
