@@ -6,6 +6,7 @@ import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -342,7 +343,74 @@ public class BusinessProcesses extends javax.swing.JFrame {
 		
 		int returnVal = takes.insert( ti.getConn() );
 		
-		if (returnVal == 1){
+		//Get skills for that course
+		String getSkillsForGivenCourse = "SELECT ks_code FROM course_skill WHERE c_code = 'wd1'";
+		ArrayList skillsList = new ArrayList();
+		try {
+			PreparedStatement ps = ti.getConn().prepareStatement(getSkillsForGivenCourse);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next() == true)	{
+			        skillsList.add( rs.getInt(1) ); // Or even rs.getObject()
+			};
+			//System.out.println(skillsList.toString());
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		//Update person's skills from skillList
+		String updatePersonSkills = "";
+		int resultOfSkillInsert = 0;
+		for (int i = 0; i < skillsList.size(); i++){
+			updatePersonSkills = "INSERT INTO obtained_skills VALUES(?,?)";
+
+			try {
+				PreparedStatement ps = ti.getConn().prepareStatement(updatePersonSkills);
+				ps.setInt(1, perID);
+				ps.setInt(2,  (int) skillsList.get(i));
+				resultOfSkillInsert = ps.executeUpdate();
+				
+			
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		//Get certs for that course
+		String getCertsForGivenCourse = "SELECT cer_code FROM requires WHERE c_code = 'wd1'";
+		ArrayList<String> certsList = new ArrayList<String>();
+		try {
+			PreparedStatement ps = ti.getConn().prepareStatement(getCertsForGivenCourse);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next() == true)	{
+			        certsList.add( rs.getString(1) ); // Or even rs.getObject()
+			};
+			System.out.println(skillsList.toString());
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		//Update person's skills from skillList
+		String updatePersonCerts = "";
+		int resultOfCertInsert = 0;
+		for (int i = 0; i < certsList.size(); i++){
+			updatePersonCerts = "INSERT INTO obtained_certificates VALUES(?,?)";
+
+			try {
+				PreparedStatement ps = ti.getConn().prepareStatement(updatePersonCerts);
+				ps.setInt(1, perID);
+				ps.setString(2,  certsList.get(i));
+				resultOfCertInsert = ps.executeUpdate();				
+			
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+
+		
+		if (returnVal == 1 && resultOfSkillInsert == 1){
 			JOptionPane.showMessageDialog(null, "Update Successful" );
 		}
 		else {
