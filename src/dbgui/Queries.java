@@ -283,7 +283,7 @@ public class Queries extends javax.swing.JFrame {
 			this.jobCodeField.setEditable(false);
 		}
 		
-		else if (qn == 7 || qn == 9 || qn == 17 || qn == 18 || qn == 19 || qn == 20 ){
+		else if (qn == 7 || qn == 9 || qn == 17 || qn == 18 || qn == 19 || qn == 20 || qn == 21 || qn == 22 ){
 			this.compIDField.setEditable(false);
 			this.perIDField.setEditable(false);
 			this.jobProfileField.setEditable(true);
@@ -400,8 +400,23 @@ public class Queries extends javax.swing.JFrame {
 
 			};
 		}
-		else if (qn == 18 || qn == 19 || qn == 20) {
+		else if (qn == 18 || qn == 19 || qn == 20 || qn == 22) {
 			String jobProfileString = jobProfileField.getText();
+			queryString = queryString.replaceFirst("\\?", jobProfileString);
+			queryString = queryString.replaceFirst("\\?", jobProfileString);
+			queryString = queryString.replaceFirst("\\?", jobProfileString);
+			queryString = queryString.replaceFirst("\\?", jobProfileString);
+			String[] queryStringSpaced = queryString.split(":");
+			qArea.setText(queryStringSpaced[0]);
+			for (int i = 1; i < queryStringSpaced.length; i++)	{
+				qArea.append(" \n" + queryStringSpaced[i]);
+
+			};
+		}
+		else if (qn == 21) {
+			String jobProfileString = jobProfileField.getText();
+			queryString = queryString.replaceFirst("\\?", jobProfileString);
+			queryString = queryString.replaceFirst("\\?", jobProfileString);
 			queryString = queryString.replaceFirst("\\?", jobProfileString);
 			queryString = queryString.replaceFirst("\\?", jobProfileString);
 			queryString = queryString.replaceFirst("\\?", jobProfileString);
@@ -499,11 +514,20 @@ public class Queries extends javax.swing.JFrame {
 			ps.setInt(4, perIDInt);
 		}
 		
-		else if ( queryNum == 18 || queryNum == 19 || queryNum == 20 ){
+		else if ( queryNum == 18 || queryNum == 19 || queryNum == 20 || queryNum == 22 ){
 			ps.setInt(1, jobProfileInt);
 			ps.setInt(2, jobProfileInt);
 			ps.setInt(3, jobProfileInt);
 			ps.setInt(4, jobProfileInt);
+		}
+		
+		else if ( queryNum == 21 ){
+			ps.setInt(1, jobProfileInt);
+			ps.setInt(2, jobProfileInt);
+			ps.setInt(3, jobProfileInt);
+			ps.setInt(4, jobProfileInt);
+			ps.setInt(5, jobProfileInt);
+			ps.setInt(6, jobProfileInt);
 		}
 		
 		

@@ -365,6 +365,76 @@ public class QueryList {
 						"WHERE missing_count = (SELECT MIN(missing_count) FROM missing_skill_count)";
 		}
 		
+		else if (number == 21) {
+			queryText = "WITH PersonRequiredSkillCnt(per_id, skill_count) AS ( : " +
+						"SELECT per_id, COUNT(ks_code) : " +
+						"FROM obtained_skills NATURAL JOIN required_skill : " +
+						"WHERE pos_code = ? : " +
+						"GROUP BY per_id ), : " +
+						"PersonRequiredCertCnt(per_id, cert_count) AS ( : " +
+						"SELECT per_id, COUNT(cer_code) : " +
+						"FROM obtained_certificates NATURAL JOIN job_cert : " +
+						"WHERE pos_code = ? : " +
+						"GROUP BY per_id ) : " +
+						"SELECT per_id, (SELECT COUNT(*) FROM required_skill WHERE pos_code = ? ) - skill_count AS num_missing, 'skill' as kind : " +
+						"FROM PersonRequiredSkillCnt : " +
+						"WHERE skill_count >= (SELECT COUNT(*) - 2 FROM required_skill WHERE pos_code = ? ) : " +
+						"UNION : " +
+						"SELECT per_id, (SELECT COUNT(*) FROM job_cert WHERE pos_code = ? ) - cert_count AS num_missing, 'cert' as kind : " +
+						"FROM PersonRequiredCertCnt : " +
+						"WHERE cert_count >= (SELECT COUNT(*) - 2 FROM job_cert WHERE pos_code = ? )";
+		}
+		
+		else if (number == 22) {
+			queryText = "WITH certset(per_id, cer_code) AS ( : " +
+						"SELECT DISTINCT per_id, cer_code : " +
+						"FROM job_cert NATURAL JOIN obtained_certificates : " +
+						"WHERE pos_code = ? ), : " +
+						"necessary_cert(cer_code) AS ( : " +
+						"SELECT DISTINCT cer_code  : " +
+						"FROM job_cert  : " +
+						"WHERE pos_code = ? ), : " +
+						"missing_certs(per_id, cer_code) AS ( : " +
+						"SELECT DISTINCT C.per_id, N.cer_code : " +
+						"FROM necessary_cert N, certset C : " +
+						"WHERE EXISTS( : " +
+						"SELECT cer_code FROM necessary_cert : " +
+						"WHERE cer_code = N.cer_code : " +
+						"MINUS : " +
+						"SELECT cer_code FROM certset : " +
+						"WHERE per_id = C.per_id )  : " +
+						"ORDER BY per_id ), : " +
+						"missing_cert_count(per_id, missing_count) AS ( : " +
+						"SELECT per_id, COUNT(per_id) as missing_count : " +
+						"FROM missing_certs : " +
+						"GROUP BY per_id ), : " +
+						"skillset(per_id, ks_code) AS ( : " +
+						"SELECT DISTINCT per_id, ks_code : " +
+						"FROM required_skill NATURAL JOIN obtained_skills : " +
+						"WHERE pos_code = ? ), : " +
+						"necessary_skill(ks_code) AS ( : " +
+						"SELECT DISTINCT ks_code  : " +
+						"FROM required_skill  : " +
+						"WHERE pos_code = ? ), : " +
+						"missing_skills(per_id, ks_code) AS ( : " +
+						"SELECT DISTINCT C.per_id, N.ks_code : " +
+						"FROM necessary_skill N, skillset C : " +
+						"WHERE EXISTS( : " +
+						"SELECT ks_code FROM necessary_skill : " +
+						"WHERE ks_code = N.ks_code : " +
+						"MINUS : " +
+						"SELECT ks_code FROM skillset : " +
+						"WHERE per_id = C.per_id)  : " +
+						"ORDER BY per_id ), : " +
+						"missing_skill_count(per_id, missing_count) AS ( : " +
+						"SELECT per_id, COUNT(per_id) as missing_count : " +
+						"FROM missing_skills : " +
+						"GROUP BY per_id ) : " +
+						"SELECT ks_code, COUNT(ks_code) FROM missing_skills NATURAL JOIN missing_skill_count : " +
+						"GROUP BY ks_code : " +
+						"HAVING COUNT(ks_code) < 2 ";			
+		}
+		
 		else if (number == 26) {
 			queryText = "SELECT sector_name, COUNT(sector_name) as job_count: " +
 						"FROM sector NATURAL JOIN company NATURAL JOIN job NATURAL JOIN job_profile: " +
