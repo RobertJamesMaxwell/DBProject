@@ -523,19 +523,14 @@ public class BusinessProcesses extends javax.swing.JFrame {
 		int perID = fjPanelPersonCombo.getSelectedIndex();
 		Date date = new Date( new java.util.Date().getTime() );
 		
-		//DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-		//String dateString = "TO_DATE ('"+ dateFormat.format(date) + "', 'yyyymmdd')";
-		//String nullString = "null";
-		Works works = new Works(perID, jobCode, date, null);
-		System.out.println(works.getPerID());
-		System.out.println(works.getJobCode());
-		System.out.println(works.getStartDate());
-		System.out.println(works.getEndDate());
-		
-		
-		works.insert( ti.getConn() );
 
-		//TO_DATE('19990112', 'yyyymmdd')
+		Works works = new Works(perID, jobCode, date, null);	
+		
+		int worksInsert = works.insert( ti.getConn() );
+
+		if (worksInsert == 1) {
+			JOptionPane.showMessageDialog(null, "Update Successful" );
+		}
 		
 	}
 	
