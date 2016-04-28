@@ -21,7 +21,7 @@ public class Job {
 	
 	}
 	
-	final String addJobString = "INSERT INTO takes VALUES(?, ?, ?, ?, ?, ?)";
+	final String addJobString = "INSERT INTO job VALUES(?, ?, ?, ?, ?, ?)";
 	private PreparedStatement ps;
 	
 	private int jobCode;

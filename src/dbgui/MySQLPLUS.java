@@ -96,7 +96,7 @@ public class MySQLPLUS extends javax.swing.JFrame {
 					resultTable = new JTable();
 					resultPane.setViewportView(resultTable);
 					resultTable.setModel(resultTableModel);
-					resultTable.setPreferredSize(new java.awt.Dimension(658, 308));
+				//	resultTable.setPreferredSize(new java.awt.Dimension(658, 308));
 				}
 			}
 			{
