@@ -642,6 +642,26 @@ public class BusinessProcesses extends javax.swing.JFrame {
 		
 		int posCode = fwPanelJobProfileCombo.getSelectedIndex();
 		
+		
+		
+		QueryList query = new QueryList();
+		String queryString = query.getQuery(18);
+		queryString = queryString.replaceAll(":", "");
+			
+
+		try {
+			ps = ti.getConn().prepareStatement(queryString);
+
+			java.sql.ResultSet rs = ps.executeQuery();
+			TableModel tableModel = new DefaultTableModel(ti.resultSet2Vector(rs), ti.getTitlesAsVector(rs));
+			resultTable.setModel(tableModel);
+		
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+			JOptionPane.showMessageDialog(null, sqle.getMessage() );
+		}
+		/*	
+		
 		//Update psString to pull from Query 17 in QueryList
 		String psString = "WITH q_by_skill(per_id, per_first_name, per_last_name, per_email) AS ( " +
 						  "SELECT P.per_id, per_first_name, per_last_name, per_email FROM person P " +
@@ -681,6 +701,9 @@ public class BusinessProcesses extends javax.swing.JFrame {
 			JOptionPane.showMessageDialog(null, sqle.getMessage() );
 		}
 		
+		
+		*/
+		
 
 	}
 	
@@ -714,7 +737,7 @@ public class BusinessProcesses extends javax.swing.JFrame {
 		}
 		
 		QueryList query = new QueryList();
-		String queryString = query.getQuery(26);
+		String queryString = query.getQuery(50);
 		queryString = queryString.replaceAll(":", "");
 			
 
