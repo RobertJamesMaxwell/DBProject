@@ -283,7 +283,7 @@ public class Queries extends javax.swing.JFrame {
 			this.jobCodeField.setEditable(false);
 		}
 		
-		else if (qn == 7 || qn == 9 || qn == 17 || qn == 18 ){
+		else if (qn == 7 || qn == 9 || qn == 17 || qn == 18 || qn == 19 || qn == 20 ){
 			this.compIDField.setEditable(false);
 			this.perIDField.setEditable(false);
 			this.jobProfileField.setEditable(true);
@@ -400,7 +400,7 @@ public class Queries extends javax.swing.JFrame {
 
 			};
 		}
-		else if (qn == 18) {
+		else if (qn == 18 || qn == 19 || qn == 20) {
 			String jobProfileString = jobProfileField.getText();
 			queryString = queryString.replaceFirst("\\?", jobProfileString);
 			queryString = queryString.replaceFirst("\\?", jobProfileString);
@@ -499,7 +499,7 @@ public class Queries extends javax.swing.JFrame {
 			ps.setInt(4, perIDInt);
 		}
 		
-		else if ( queryNum == 18 ){
+		else if ( queryNum == 18 || queryNum == 19 || queryNum == 20 ){
 			ps.setInt(1, jobProfileInt);
 			ps.setInt(2, jobProfileInt);
 			ps.setInt(3, jobProfileInt);
