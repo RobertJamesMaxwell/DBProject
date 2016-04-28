@@ -16,14 +16,14 @@ public class Works {
 		setEndDate(null); 
 	}
 	
-	public Works(Person person, Job job, Date startDate, String endDate){
+	public Works(Person person, Job job, Date startDate, Date endDate){
 		setPerID(person.getPerID());
 		setJobCode(job.getJobCode());
 		setStartDate(startDate);
 		setEndDate(endDate);
 	}
 	
-	public Works(int perID, int jobCode, Date startDate, String endDate){
+	public Works(int perID, int jobCode, Date startDate, Date endDate){
 		setPerID(perID);
 		setJobCode(jobCode);
 		setStartDate(startDate);
@@ -36,7 +36,7 @@ public class Works {
 	private int perID;
 	private int jobCode;
 	private Date startDate;
-	private String endDate;
+	private Date endDate;
 	
 	public int getPerID(){
 		return this.perID;
@@ -62,11 +62,11 @@ public class Works {
 		this.startDate = startDate;
 	}
 	
-	public String getEndDate(){
+	public Date getEndDate(){
 		return this.endDate;
 	}
 	
-	public void setEndDate(String endDate){
+	public void setEndDate(Date endDate){
 		this.endDate = endDate;
 	}
 	
@@ -78,7 +78,7 @@ public class Works {
 			ps.setInt(1, this.perID );
 			ps.setInt(2, this.jobCode );
 			ps.setDate(3, this.startDate );
-			ps.setString(4, this.endDate );
+			ps.setDate(4, this.endDate );
 			return ps.executeUpdate();
 				
 			
