@@ -45,43 +45,82 @@ public class QueryList {
 			queryText = "SELECT per_id, ks_title : " +
 						"FROM person NATURAL JOIN works NATURAL JOIN job NATURAL JOIN job_profile : " +
 						"NATURAL JOIN required_skill NATURAL JOIN knowledge_skill : " +
+						"WHERE end_date IS NULL AND per_id = ? : " +
 						"MINUS  : " +
 						"SELECT per_id, ks_title : " +
-						"FROM person NATURAL JOIN obtained_skills NATURAL JOIN knowledge_skill";
+						"FROM person NATURAL JOIN obtained_skills NATURAL JOIN knowledge_skill : " +
+						"WHERE per_id = ? ";
 		}
 		
 		else if (number == 7){
-			queryText = "SELECT pos_code, ks_title, cer_code : " +
-						"FROM job_profile NATURAL JOIN required_skill NATURAL JOIN knowledge_skill FULL OUTER JOIN job_cert USING(pos_code) : " +
+			queryText = "SELECT DISTINCT ks_title : " +
+						"FROM job_profile NATURAL JOIN required_skill NATURAL JOIN knowledge_skill : " +
 						"WHERE pos_code = ? ";
 			
 		}
 		else if (number == 8){
 			queryText = "WITH skills(ks_title, kind) AS ( : " +
 						"SELECT ks_title, 'skill' : " +
-						"FROM job NATURAL JOIN job_profile NATURAL JOIN required_skill NATURAL JOIN knowledge_skill WHERE job_code = ? : " +
+						"FROM job NATURAL JOIN required_skill NATURAL JOIN knowledge_skill WHERE job_code = ? : " +
 						"MINUS : " +
 						"SELECT ks_title, 'skill' : " +
-						"FROM person NATURAL JOIN obtained_skills NATURAL JOIN knowledge_skill : " +
+						"FROM obtained_skills NATURAL JOIN knowledge_skill : " +
 						"WHERE per_id = ? ), : " +
 						"certificates(cer_title, kind) AS ( : " +
 						"SELECT cer_title, 'certificate' : " +
-						"FROM job NATURAL JOIN job_profile NATURAL JOIN job_cert NATURAL JOIN certificate WHERE job_code = ? : " +
+						"FROM job NATURAL JOIN job_cert NATURAL JOIN certificate WHERE job_code = ? : " +
 						"MINUS : " +
 						"SELECT cer_title, 'certificate' : " +
-						"FROM person NATURAL JOIN obtained_certificates NATURAL JOIN certificate : " +
+						"FROM obtained_certificates NATURAL JOIN certificate : " +
 						"WHERE per_id = ? ) : " +
 						"SELECT ks_title, kind FROM skills UNION SELECT cer_title, kind from certificates";
 			
 		}
 		else if (number == 9) {
-			queryText = "SELECT C.c_code FROM course C : " +
+			queryText = "SELECT C.c_code, 'skill' as covers FROM course C : " +
 						"WHERE NOT EXISTS ( : " +
-						"SELECT ks_code, cer_code FROM required_skill NATURAL JOIN job_profile FULL OUTER JOIN job_cert USING(pos_code) : " +
+						"SELECT ks_code FROM job_profile LEFT OUTER JOIN required_skill USING(pos_code) : " +
+						"WHERE pos_code = ?  : " +
+						"MINUS : " +
+						"SELECT ks_code FROM course_skill LEFT OUTER JOIN course USING(c_code) : " +
+						"WHERE C.c_code = c_code and ks_code is not null ) and c_code is not null : " +
+						"UNION : " +
+						"SELECT C.c_code, 'cert' as covers FROM course C : " +
+						"WHERE NOT EXISTS ( : " +
+						"SELECT cer_code FROM job_profile LEFT OUTER JOIN job_cert USING(pos_code) : " +
+						"WHERE pos_code = ?  : " +
+						"MINUS : " +
+						"SELECT cer_code FROM requires LEFT OUTER JOIN course USING(c_code) : " +
+						"WHERE C.c_code = c_code and cer_code is not null ) and c_code is not null";
+		}
+		
+		else if (number == 10) {
+			queryText = "WITH missing_skill(ks_code) AS ( : " +
+						"SELECT ks_code FROM required_skill NATURAL JOIN job_profile : " +
 						"WHERE pos_code = ? : " +
 						"MINUS : " +
-						"SELECT ks_code, cer_code FROM course_skill NATURAL JOIN course FULL OUTER JOIN requires USING(c_code) : " +
-						"WHERE C.c_code = c_code";
+						"SELECT ks_code FROM obtained_skills NATURAL JOIN person : " +
+						"WHERE per_id = ? ),  : " +
+						"missing_cert(cer_code) AS ( : " +
+						"SELECT cer_code FROM job_cert : " +
+						"WHERE pos_code = ? : " +
+						"MINUS : " +
+						"SELECT cer_code FROM obtained_certificates NATURAL JOIN person : " +
+						"WHERE per_id = ? ) : " +
+						"SELECT C.c_code, 'cert' as KIND FROM course C : " +
+						"WHERE NOT EXISTS ( : " +
+						"SELECT cer_code FROM missing_cert : " +
+						"MINUS : " +
+						"SELECT cer_code FROM course LEFT OUTER JOIN requires USING(c_code) : " +
+						"WHERE C.c_code = c_code) AND (SELECT COUNT(cer_code) FROM missing_cert) > 0 : " +
+						"UNION : " +
+						"SELECT C.c_code, 'skill' AS kind FROM course C : " +
+						"WHERE NOT EXISTS ( : " +
+						"SELECT ks_code FROM missing_skill : " +
+						"MINUS : " +
+						"SELECT ks_code FROM course LEFT OUTER JOIN course_skill USING(c_code) : " +
+						"WHERE C.c_code = c_code : " +
+						") AND (SELECT COUNT(ks_code) FROM missing_skill) > 0";
 		}
 		
 		else if (number == 18) {

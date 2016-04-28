@@ -45,6 +45,8 @@ public class Queries extends javax.swing.JFrame {
 	private JTextField perIDField;
 	private JLabel jobProfile;
 	private JTextField jobProfileField;
+	private JLabel jobCode;
+	private JTextField jobCodeField;
 	private PreparedStatement ps = null;
 
 	private TableInfo ti;			// the persistent manager 
@@ -115,6 +117,20 @@ public class Queries extends javax.swing.JFrame {
 				jobProfileField.setEditable(false);
 			}
 			
+			//Set job_code field
+			{
+				jobCode = new JLabel();
+				getContentPane().add(jobCode);
+				jobCode.setText("Set job_code: ");
+				jobCode.setBounds(750, 160, 119, 28);
+			}
+			{
+				jobCodeField = new JTextField("");
+				getContentPane().add(jobCodeField);
+				jobCodeField.setBounds(900, 160, 119, 28);
+				jobCodeField.setEditable(false);
+			}
+			
 			//Create dropdown menu for queries
 			{
 				qLabel = new JLabel();
@@ -169,7 +185,6 @@ public class Queries extends javax.swing.JFrame {
 				getContentPane().add(messagePane);
 				messagePane.setBounds(750, 350, 358, 248);
 				messagePane.setViewportView(message);
-				//message.setPreferredSize(new java.awt.Dimension(655, 95));
 			}
 			
 			{
@@ -185,7 +200,6 @@ public class Queries extends javax.swing.JFrame {
 			}
 			{
 				resultPane = new JScrollPane();
-				//resultPane.setLayout(new GridBagLayout());
 				getContentPane().add(resultPane);
 				resultPane.setBounds(35, 352, 658, 329);
 				{
@@ -213,13 +227,11 @@ public class Queries extends javax.swing.JFrame {
 
 		drawToScreen(queryNum, queryString);
 		String psString = getPreparedStatementString(queryString);
-		
-		
+			
 		try {
 				ps = ti.getConn().prepareStatement(psString);
 				ps = setPreparedStatement(queryNum, ps);
-
-				
+		
 				java.sql.ResultSet rs = ps.executeQuery();
 				TableModel tableModel = new DefaultTableModel(ti.resultSet2Vector(rs), ti.getTitlesAsVector(rs));
 				resultTable.setModel(tableModel);
@@ -236,6 +248,7 @@ public class Queries extends javax.swing.JFrame {
 			compIDField.setText("");
 			perIDField.setText("");
 			jobProfileField.setText("");
+			jobCodeField.setText("");
 			qArea.setText("");
 			{
 				TableModel resultTableModel = new DefaultTableModel(
@@ -250,34 +263,52 @@ public class Queries extends javax.swing.JFrame {
 	}
 	
 	private void setVariableFields(int qn){
-		if (qn == 1 || qn == 4 || qn == 5 || qn == 6 )	{
+		if (qn == 1 || qn == 4 || qn == 5 )	{
 			this.compIDField.setEditable(false);
 			this.perIDField.setEditable(false);
 			this.jobProfileField.setEditable(false);
+			this.jobCodeField.setEditable(false);
+		}
+		else if (qn == 6) {
+			this.compIDField.setEditable(false);
+			this.perIDField.setEditable(true);
+			this.jobProfileField.setEditable(false);
+			this.jobCodeField.setEditable(false);
 		}
 			
 		else if (qn == 2 || qn == 3){
 			this.compIDField.setEditable(true);
 			this.perIDField.setEditable(false);
 			this.jobProfileField.setEditable(false);
+			this.jobCodeField.setEditable(false);
 		}
 		
 		else if (qn == 7 || qn == 9 ){
 			this.compIDField.setEditable(false);
 			this.perIDField.setEditable(false);
 			this.jobProfileField.setEditable(true);
+			this.jobCodeField.setEditable(false);
 		}
 		
 		else if (qn == 8 ){
 			this.compIDField.setEditable(false);
 			this.perIDField.setEditable(true);
+			this.jobProfileField.setEditable(false);
+			this.jobCodeField.setEditable(true);
+		}
+		
+		else if (qn == 10 ){
+			this.compIDField.setEditable(false);
+			this.perIDField.setEditable(true);
 			this.jobProfileField.setEditable(true);
+			this.jobCodeField.setEditable(false);
 		}
 		
 		else {
 			this.compIDField.setEditable(false);
 			this.perIDField.setEditable(false);
 			this.jobProfileField.setEditable(false);
+			this.jobCodeField.setEditable(false);
 		}
 
 	}
@@ -286,7 +317,7 @@ public class Queries extends javax.swing.JFrame {
 	
 	private void drawToScreen(int qn, String queryString){
 
-		if (qn == 1 || qn == 4 || qn ==5 || qn == 6){
+		if (qn == 1 || qn == 4 || qn ==5 ){
 			String[] queryStringSpaced = queryString.split(":");
 			qArea.setText(queryStringSpaced[0]);
 			for (int i = 1; i < queryStringSpaced.length; i++)	{
@@ -294,6 +325,19 @@ public class Queries extends javax.swing.JFrame {
 
 			};
 		}
+		
+		else if (qn == 6) {
+			String perIDString = perIDField.getText();
+			queryString = queryString.replaceFirst("\\?", perIDString);
+			queryString = queryString.replaceFirst("\\?", perIDString);
+			String[] queryStringSpaced = queryString.split(":");
+			qArea.setText(queryStringSpaced[0]);
+			for (int i = 1; i < queryStringSpaced.length; i++)	{
+				qArea.append(" \n" + queryStringSpaced[i]);
+
+			};
+		}
+		
 		else if (qn == 2 || qn == 3) {
 			String compIDString = compIDField.getText();
 			queryString = queryString.replaceFirst("\\?", compIDString);
@@ -304,7 +348,7 @@ public class Queries extends javax.swing.JFrame {
 
 			};
 		}
-		else if (qn == 7 || qn == 9) {
+		else if (qn == 7) {
 			String jobProfileString = jobProfileField.getText();
 			queryString = queryString.replaceFirst("\\?", jobProfileString);
 			String[] queryStringSpaced = queryString.split(":");
@@ -314,7 +358,23 @@ public class Queries extends javax.swing.JFrame {
 
 			};
 		}
+		
 		else if (qn == 8) {
+			String jobCodeString = jobCodeField.getText();
+			String perIDString = perIDField.getText();
+			queryString = queryString.replaceFirst("\\?", jobCodeString);
+			queryString = queryString.replaceFirst("\\?", perIDString);
+			queryString = queryString.replaceFirst("\\?", jobCodeString);
+			queryString = queryString.replaceFirst("\\?", perIDString);
+			String[] queryStringSpaced = queryString.split(":");
+			qArea.setText(queryStringSpaced[0]);
+			for (int i = 1; i < queryStringSpaced.length; i++)	{
+				qArea.append(" \n" + queryStringSpaced[i]);
+
+			};
+		}
+		
+		else if (qn == 10) {
 			String jobProfileString = jobProfileField.getText();
 			String perIDString = perIDField.getText();
 			queryString = queryString.replaceFirst("\\?", jobProfileString);
@@ -328,6 +388,19 @@ public class Queries extends javax.swing.JFrame {
 
 			};
 		}
+		else if (qn == 9) {
+			String jobProfileString = jobProfileField.getText();
+			queryString = queryString.replaceFirst("\\?", jobProfileString);
+			queryString = queryString.replaceFirst("\\?", jobProfileString);
+			String[] queryStringSpaced = queryString.split(":");
+			qArea.setText(queryStringSpaced[0]);
+			for (int i = 1; i < queryStringSpaced.length; i++)	{
+				qArea.append(" \n" + queryStringSpaced[i]);
+
+			};
+		}
+		
+		
 	}
 	
 	private String getPreparedStatementString(String queryString){
@@ -340,6 +413,7 @@ public class Queries extends javax.swing.JFrame {
 		int compIDInt = 0;
 		int perIDInt = 0; 
 		int jobProfileInt = 0;
+		int jobCodeInt = 0;
 		
 		if ( compIDField.isEditable()  ) {
 			String compIDString = compIDField.getText();			
@@ -371,19 +445,47 @@ public class Queries extends javax.swing.JFrame {
 			}
 		} 
 		
+		if ( jobCodeField.isEditable()  ) {
+			String jobCodeString = jobCodeField.getText();			
+			try {
+				jobCodeInt = Integer.parseInt(jobCodeString);
+			}
+			catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(null, "Enter valid job code number" );
+			}
+		} 
+		
 		
 		if ( queryNum == 2 || queryNum == 3 ){
 			ps.setInt(1, compIDInt);
 		}
-		if ( queryNum == 7 || queryNum == 9 ){
+
+		else if ( queryNum == 6 ){
+			ps.setInt(1, perIDInt);
+			ps.setInt(2, perIDInt);
+		}
+		else if ( queryNum == 7 ){
 			ps.setInt(1, jobProfileInt);
 		}
-		if ( queryNum == 8 ){
+		else if ( queryNum == 8 ){
+			ps.setInt(1, jobCodeInt);
+			ps.setInt(2, perIDInt);
+			ps.setInt(3, jobCodeInt);
+			ps.setInt(4, perIDInt);
+		}
+
+		else if ( queryNum == 9 ){
+			ps.setInt(1, jobProfileInt);
+			ps.setInt(2, jobProfileInt);
+		}
+		else if ( queryNum == 10 ){
 			ps.setInt(1, jobProfileInt);
 			ps.setInt(2, perIDInt);
 			ps.setInt(3, jobProfileInt);
 			ps.setInt(4, perIDInt);
 		}
+		
+		
 		return ps;
 	}
 }
