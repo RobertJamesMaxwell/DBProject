@@ -7,9 +7,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.swing.ComboBoxModel;
@@ -34,6 +37,7 @@ import tables.JobProfile;
 import tables.Person;
 import tables.Section;
 import tables.Takes;
+import tables.Works;
 
 public class BusinessProcesses extends javax.swing.JFrame {
 
@@ -504,20 +508,34 @@ public class BusinessProcesses extends javax.swing.JFrame {
 	
 	private void addPersonJobButActionPerformed(ActionEvent evt) {
 		int rowSelection = fjresultTable.getSelectedRow();
+		int jobCode = 0;
 		try {
 			fjrs.first();
 			for ( int i = 0; i < rowSelection; i++ ){
 				fjrs.next();
 			}
-			int jobCode = fjrs.getInt(1);
-			System.out.println(jobCode);
+			jobCode = fjrs.getInt(1);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		int perID = fjPanelPersonCombo.getSelectedIndex();
-		Works works = new Works( perID, jobCode );
+		Date date = new Date( new java.util.Date().getTime() );
+		
+		//DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		//String dateString = "TO_DATE ('"+ dateFormat.format(date) + "', 'yyyymmdd')";
+		//String nullString = "null";
+		Works works = new Works(perID, jobCode, date, null);
+		System.out.println(works.getPerID());
+		System.out.println(works.getJobCode());
+		System.out.println(works.getStartDate());
+		System.out.println(works.getEndDate());
+		
+		
+		works.insert( ti.getConn() );
+
+		//TO_DATE('19990112', 'yyyymmdd')
 		
 	}
 	
@@ -526,17 +544,21 @@ public class BusinessProcesses extends javax.swing.JFrame {
 		int perID = fjPanelPersonCombo.getSelectedIndex();
 		
 		//Update psString to pull from Query 15 in QueryList
-		String psString = "SELECT J.pos_code, J.job_title FROM job_profile J " +
-						  "WHERE NOT EXISTS ( " +
-						  "SELECT ks_code FROM required_skill " +
-						  "WHERE J.pos_code = pos_code " +
-						  "MINUS " +
-						  "SELECT ks_code FROM obtained_skills " +
-						  "WHERE per_id = ? ) "; 
+		String psString = "WITH vacant_jobs(job_code) AS ( " +
+						"SELECT job_code " +
+						"FROM job MINUS " +
+						"SELECT job_code " +
+						"FROM works ) " +
+						"SELECT *  " +
+						"FROM job J " +
+						"WHERE EXISTS ( " +
+						"SELECT job_code  " +
+						"FROM vacant_jobs " +
+						"WHERE job_code = J.job_code)"; 
 		
 		try {
-			ps = ti.getConn().prepareStatement(psString,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-			ps.setInt(1, perID);;
+			ps = ti.getConn().prepareStatement(psString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+			//ps.setInt(1, perID);;
 
 			fjrs = ps.executeQuery();
 			TableModel tableModel = new DefaultTableModel(ti.resultSet2Vector(fjrs), ti.getTitlesAsVector(fjrs));

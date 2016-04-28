@@ -1,6 +1,7 @@
 package tables;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -15,26 +16,26 @@ public class Works {
 		setEndDate(null); 
 	}
 	
-	public Works(Person person, Job job, String startDate, String endDate){
+	public Works(Person person, Job job, Date startDate, String endDate){
 		setPerID(person.getPerID());
 		setJobCode(job.getJobCode());
 		setStartDate(startDate);
 		setEndDate(endDate);
 	}
 	
-	public Works(int perID, int jobCode, String startDate, String endDate){
+	public Works(int perID, int jobCode, Date startDate, String endDate){
 		setPerID(perID);
 		setJobCode(jobCode);
 		setStartDate(startDate);
 		setEndDate(endDate);
 	}
 	
-	final String addWorksString = "INSERT INTO takes VALUES(?, ?, ?, ?)";
+	final String addWorksString = "INSERT INTO works VALUES(?, ?, ?, ?)";
 	private PreparedStatement ps;
 	
 	private int perID;
 	private int jobCode;
-	private String startDate;
+	private Date startDate;
 	private String endDate;
 	
 	public int getPerID(){
@@ -53,11 +54,11 @@ public class Works {
 		this.jobCode = jobCode;
 	}
 	
-	public String getStartDate(){
+	public Date getStartDate(){
 		return this.startDate;
 	}
 	
-	public void setStartDate(String startDate){
+	public void setStartDate(Date startDate){
 		this.startDate = startDate;
 	}
 	
@@ -76,7 +77,7 @@ public class Works {
 			
 			ps.setInt(1, this.perID );
 			ps.setInt(2, this.jobCode );
-			ps.setString(3, this.startDate );
+			ps.setDate(3, this.startDate );
 			ps.setString(4, this.endDate );
 			return ps.executeUpdate();
 				
