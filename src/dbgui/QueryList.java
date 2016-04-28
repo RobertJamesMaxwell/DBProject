@@ -123,6 +123,62 @@ public class QueryList {
 						") AND (SELECT COUNT(ks_code) FROM missing_skill) > 0";
 		}
 		
+		else if (number == 11) {
+			queryText = "WITH missing_skill(ks_code) AS ( : " +
+						"SELECT ks_code FROM required_skill : " +
+						"WHERE pos_code = ? : " +
+						"MINUS : " +
+						"SELECT ks_code FROM obtained_skills : " +
+						"WHERE per_id = ? ), : " +
+						"missing_cert(cer_code) AS ( : " +
+						"SELECT cer_code FROM job_cert : " +
+						"WHERE pos_code = ? : " +
+						"MINUS : " +
+						"SELECT cer_code FROM obtained_certificates : " +
+						"WHERE per_id = ? ), : " +
+						"needed_course_skill(c_code, sec_no, semester, year, complete_date) AS ( : " +
+						"SELECT c.c_code, c.sec_no, c.semester, c.year, c.complete_date FROM section c : " +
+						"WHERE NOT EXISTS ( : " +
+						"SELECT ks_code FROM missing_skill : " +
+						"MINUS : " +
+						"SELECT ks_code FROM course_skill : " +
+						"WHERE C.c_code = c_code ) AND (SELECT COUNT(ks_code) FROM missing_skill) > 0), : " +
+						"needed_course_cert(c_code, sec_no, semester, year, complete_date) AS ( : " +
+						"SELECT c.c_code, c.sec_no, c.semester, c.year, c.complete_date FROM section c : " +
+						"WHERE NOT EXISTS ( : " +
+						"SELECT cer_code FROM missing_cert : " +
+						"MINUS : " +
+						"SELECT cer_code FROM requires : " +
+						"WHERE C.c_code = c_code ) AND (SELECT COUNT(cer_code) FROM missing_cert) > 0) : " +
+						"SELECT c_code, sec_no, semester, year, complete_date, 'cert' AS kind : " +
+						"FROM needed_course_cert : " +
+						"WHERE complete_date = (SELECT MIN(complete_date) FROM needed_course_cert) : " +
+						"UNION : " +
+						"SELECT c_code, sec_no, semester, year, complete_date, 'skill' AS kind : " +
+						"FROM needed_course_skill : " +
+						"WHERE complete_date = (SELECT MIN(complete_date) FROM needed_course_skill) ";
+		}
+		
+		else if (number == 15) {
+			queryText = "WITH q_by_cert(pos_code, cer_code) AS ( : " +
+						"SELECT J.pos_code, K.cer_code FROM job_profile J LEFT OUTER JOIN job_cert K ON(J.pos_code = K.pos_code) : " +
+						"WHERE NOT EXISTS ( : " +
+						"SELECT cer_code FROM job_cert : " +
+						"WHERE J.pos_code = pos_code : " +
+						"MINUS : " +
+						"SELECT cer_code FROM obtained_certificates : " +
+						"WHERE per_id = ? ) ), : " +
+						"q_by_skill(pos_code) AS( : " +
+						"SELECT J.pos_code FROM job_profile J : " +
+						"WHERE NOT EXISTS ( : " +
+						"SELECT ks_code FROM required_skill : " +
+						"WHERE J.pos_code = pos_code : " +
+						"MINUS : " +
+						"SELECT ks_code FROM obtained_skills : " +
+						"WHERE per_id = ? ) ) : " +
+						"SELECT pos_code FROM q_by_skill INTERSECT SELECT pos_code FROM q_by_cert";
+		}
+		
 		else if (number == 18) {
 			queryText = "WITH certset(per_id, certcount) AS ( : " +
 						"SELECT DISTINCT per_id, COUNT(cer_code) : " +

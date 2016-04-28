@@ -269,7 +269,7 @@ public class Queries extends javax.swing.JFrame {
 			this.jobProfileField.setEditable(false);
 			this.jobCodeField.setEditable(false);
 		}
-		else if (qn == 6) {
+		else if (qn == 6 || qn == 15) {
 			this.compIDField.setEditable(false);
 			this.perIDField.setEditable(true);
 			this.jobProfileField.setEditable(false);
@@ -297,7 +297,7 @@ public class Queries extends javax.swing.JFrame {
 			this.jobCodeField.setEditable(true);
 		}
 		
-		else if (qn == 10 ){
+		else if (qn == 10 || qn == 11 ){
 			this.compIDField.setEditable(false);
 			this.perIDField.setEditable(true);
 			this.jobProfileField.setEditable(true);
@@ -309,6 +309,7 @@ public class Queries extends javax.swing.JFrame {
 			this.perIDField.setEditable(false);
 			this.jobProfileField.setEditable(false);
 			this.jobCodeField.setEditable(false);
+			qArea.setText("Query Not Implemented");
 		}
 
 	}
@@ -326,7 +327,7 @@ public class Queries extends javax.swing.JFrame {
 			};
 		}
 		
-		else if (qn == 6) {
+		else if (qn == 6 || qn == 15) {
 			String perIDString = perIDField.getText();
 			queryString = queryString.replaceFirst("\\?", perIDString);
 			queryString = queryString.replaceFirst("\\?", perIDString);
@@ -374,7 +375,7 @@ public class Queries extends javax.swing.JFrame {
 			};
 		}
 		
-		else if (qn == 10) {
+		else if (qn == 10 || qn == 11) {
 			String jobProfileString = jobProfileField.getText();
 			String perIDString = perIDField.getText();
 			queryString = queryString.replaceFirst("\\?", jobProfileString);
@@ -460,7 +461,7 @@ public class Queries extends javax.swing.JFrame {
 			ps.setInt(1, compIDInt);
 		}
 
-		else if ( queryNum == 6 ){
+		else if ( queryNum == 6 || queryNum == 15 ){
 			ps.setInt(1, perIDInt);
 			ps.setInt(2, perIDInt);
 		}
@@ -478,7 +479,7 @@ public class Queries extends javax.swing.JFrame {
 			ps.setInt(1, jobProfileInt);
 			ps.setInt(2, jobProfileInt);
 		}
-		else if ( queryNum == 10 ){
+		else if ( queryNum == 10 || queryNum == 11 ){
 			ps.setInt(1, jobProfileInt);
 			ps.setInt(2, perIDInt);
 			ps.setInt(3, jobProfileInt);
