@@ -179,6 +179,64 @@ public class QueryList {
 						"SELECT pos_code FROM q_by_skill INTERSECT SELECT pos_code FROM q_by_cert";
 		}
 		
+		else if (number == 16) {
+			queryText = "WITH q_by_cert(pos_code, cer_code) AS ( : " +
+						"SELECT J.pos_code, K.cer_code  : " +
+						"FROM job_profile J FULL OUTER JOIN job_cert K ON(J.pos_code = K.pos_code) : " +
+						"WHERE NOT EXISTS ( : " +
+						"SELECT cer_code FROM job_profile NATURAL JOIN job_cert : " +
+						"WHERE J.pos_code = pos_code : " +
+						"MINUS : " +
+						"SELECT cer_code FROM person NATURAL JOIN obtained_certificates : " +
+						"WHERE per_id = ? ) ), : " +
+						"q_by_skill(pos_code) AS( : " +
+						"SELECT J.pos_code FROM job_profile J : " +
+						"WHERE NOT EXISTS ( : " +
+						"SELECT ks_code FROM required_skill : " +
+						"WHERE J.pos_code = pos_code : " +
+						"MINUS : " +
+						"SELECT ks_code FROM obtained_skills : " +
+						"WHERE per_id = ? ) ), : " +
+						"qualified_jobs(pos_code) AS ( : " +
+						"SELECT pos_code FROM q_by_skill : " +
+						"INTERSECT : " +
+						"SELECT pos_code FROM q_by_cert ), : " +
+						"pay_of_jobs(job_code, pay_rate) AS ( : " +
+						"SELECT job_code, ( : " +
+						"CASE WHEN pay_type = 'salary' THEN pay_rate : " +
+						"WHEN pay_type = 'wage' AND job_type = 'full-time' THEN pay_rate * 40 * 52 : " +
+						"WHEN pay_type = 'wage' AND job_type = 'part-time' THEN pay_rate * 20 * 52 : " +
+						"END ) AS pay_rate : " +
+						"FROM qualified_jobs NATURAL JOIN job )   : " +
+						"SELECT job_code, pay_rate : " +
+						"FROM pay_of_jobs : " +
+						"WHERE pay_rate = (SELECT MAX(pay_rate) FROM pay_of_jobs)";
+		}
+		
+		else if (number == 17) {
+			queryText = "WITH q_by_skill(per_id, per_first_name, per_last_name, per_email) AS ( : " +
+						"SELECT P.per_id, per_first_name, per_last_name, per_email FROM person P : " +
+						"WHERE NOT EXISTS ( : " +
+						"SELECT ks_code FROM required_skill : " +
+						"WHERE pos_code = ?  : " +
+						"MINUS : " +
+						"SELECT ks_code FROM obtained_skills : " +
+						"WHERE P.per_id = per_id ) ), : " +
+						"q_by_cert(per_id, per_first_name, per_last_name, per_email) AS ( : " +
+						"SELECT P.per_id, per_first_name, per_last_name, per_email FROM person P : " +
+						"WHERE NOT EXISTS ( : " +
+						"SELECT cer_code FROM job_cert : " +
+						"WHERE pos_code = ?  : " +
+						"MINUS : " +
+						"SELECT cer_code FROM obtained_certificates : " +
+						"WHERE P.per_id = per_id ) ) : " +
+						"SELECT per_id, per_first_name, per_last_name, per_email : " +
+						"FROM q_by_skill : " +
+						"INTERSECT : " +
+						"SELECT per_id, per_first_name, per_last_name, per_email : " +
+						"FROM q_by_cert";
+		}
+		
 		else if (number == 18) {
 			queryText = "WITH certset(per_id, certcount) AS ( : " +
 						"SELECT DISTINCT per_id, COUNT(cer_code) : " +

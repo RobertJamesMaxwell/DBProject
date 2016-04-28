@@ -269,7 +269,7 @@ public class Queries extends javax.swing.JFrame {
 			this.jobProfileField.setEditable(false);
 			this.jobCodeField.setEditable(false);
 		}
-		else if (qn == 6 || qn == 15) {
+		else if (qn == 6 || qn == 15 || qn == 16) {
 			this.compIDField.setEditable(false);
 			this.perIDField.setEditable(true);
 			this.jobProfileField.setEditable(false);
@@ -283,7 +283,7 @@ public class Queries extends javax.swing.JFrame {
 			this.jobCodeField.setEditable(false);
 		}
 		
-		else if (qn == 7 || qn == 9 ){
+		else if (qn == 7 || qn == 9 || qn == 17 || qn == 18 ){
 			this.compIDField.setEditable(false);
 			this.perIDField.setEditable(false);
 			this.jobProfileField.setEditable(true);
@@ -327,7 +327,7 @@ public class Queries extends javax.swing.JFrame {
 			};
 		}
 		
-		else if (qn == 6 || qn == 15) {
+		else if (qn == 6 || qn == 15 || qn == 16) {
 			String perIDString = perIDField.getText();
 			queryString = queryString.replaceFirst("\\?", perIDString);
 			queryString = queryString.replaceFirst("\\?", perIDString);
@@ -389,8 +389,21 @@ public class Queries extends javax.swing.JFrame {
 
 			};
 		}
-		else if (qn == 9) {
+		else if (qn == 9 || qn == 17) {
 			String jobProfileString = jobProfileField.getText();
+			queryString = queryString.replaceFirst("\\?", jobProfileString);
+			queryString = queryString.replaceFirst("\\?", jobProfileString);
+			String[] queryStringSpaced = queryString.split(":");
+			qArea.setText(queryStringSpaced[0]);
+			for (int i = 1; i < queryStringSpaced.length; i++)	{
+				qArea.append(" \n" + queryStringSpaced[i]);
+
+			};
+		}
+		else if (qn == 18) {
+			String jobProfileString = jobProfileField.getText();
+			queryString = queryString.replaceFirst("\\?", jobProfileString);
+			queryString = queryString.replaceFirst("\\?", jobProfileString);
 			queryString = queryString.replaceFirst("\\?", jobProfileString);
 			queryString = queryString.replaceFirst("\\?", jobProfileString);
 			String[] queryStringSpaced = queryString.split(":");
@@ -461,7 +474,7 @@ public class Queries extends javax.swing.JFrame {
 			ps.setInt(1, compIDInt);
 		}
 
-		else if ( queryNum == 6 || queryNum == 15 ){
+		else if ( queryNum == 6 || queryNum == 15 || queryNum == 16 ){
 			ps.setInt(1, perIDInt);
 			ps.setInt(2, perIDInt);
 		}
@@ -475,7 +488,7 @@ public class Queries extends javax.swing.JFrame {
 			ps.setInt(4, perIDInt);
 		}
 
-		else if ( queryNum == 9 ){
+		else if ( queryNum == 9 || queryNum == 17 ){
 			ps.setInt(1, jobProfileInt);
 			ps.setInt(2, jobProfileInt);
 		}
@@ -484,6 +497,13 @@ public class Queries extends javax.swing.JFrame {
 			ps.setInt(2, perIDInt);
 			ps.setInt(3, jobProfileInt);
 			ps.setInt(4, perIDInt);
+		}
+		
+		else if ( queryNum == 18 ){
+			ps.setInt(1, jobProfileInt);
+			ps.setInt(2, jobProfileInt);
+			ps.setInt(3, jobProfileInt);
+			ps.setInt(4, jobProfileInt);
 		}
 		
 		
