@@ -476,7 +476,13 @@ public class BusinessProcesses extends javax.swing.JFrame {
 			JLabel fjResultPaneLabel = new JLabel();
 			findJobPanel.add(fjResultPaneLabel);
 			fjResultPaneLabel.setText("Person is qualified for the following jobs: ");
-			fjResultPaneLabel.setBounds(35, 322, 320, 28);
+			fjResultPaneLabel.setBounds(35, 312, 320, 28);
+		}
+		{
+			JLabel fjResultPaneLabel2 = new JLabel();
+			findJobPanel.add(fjResultPaneLabel2);
+			fjResultPaneLabel2.setText("Select a job for this person: ");
+			fjResultPaneLabel2.setBounds(35, 329, 320, 28);
 		}
 		{
 			JScrollPane resultPane = new JScrollPane();
@@ -559,19 +565,6 @@ public class BusinessProcesses extends javax.swing.JFrame {
 			TableModel tableModel = new DefaultTableModel(ti.resultSet2Vector(fjrs), ti.getTitlesAsVector(fjrs));
 			fjresultTable.setModel(tableModel);
 			
-			//Add table mouse listener
-	/*		MouseListener tableMouseListener = new MouseAdapter()  {
-				
-				public void mouseClicked(MouseEvent e) {
-					
-				}
-				
-			}
-			fjresultTable.addMouseListener(tableMouseListener);
-			int x = fjresultTable.getSelectedRow();
-			System.out.println(x);
-			
-	*/
 			
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
@@ -651,46 +644,10 @@ public class BusinessProcesses extends javax.swing.JFrame {
 
 		try {
 			ps = ti.getConn().prepareStatement(queryString);
-
-			java.sql.ResultSet rs = ps.executeQuery();
-			TableModel tableModel = new DefaultTableModel(ti.resultSet2Vector(rs), ti.getTitlesAsVector(rs));
-			resultTable.setModel(tableModel);
-		
-		} catch (SQLException sqle) {
-			sqle.printStackTrace();
-			JOptionPane.showMessageDialog(null, sqle.getMessage() );
-		}
-		/*	
-		
-		//Update psString to pull from Query 17 in QueryList
-		String psString = "WITH q_by_skill(per_id, per_first_name, per_last_name, per_email) AS ( " +
-						  "SELECT P.per_id, per_first_name, per_last_name, per_email FROM person P " +
-						  "WHERE NOT EXISTS ( " +
-						  "SELECT ks_code FROM required_skill " +
-						  "WHERE pos_code = ?  " +
-						  "MINUS " +
-						  "SELECT ks_code FROM obtained_skills " +
-						  "WHERE P.per_id = per_id " +
-						  ")), " +
-						  "q_by_cert(per_id, per_first_name, per_last_name, per_email) AS ( " +
-						  "SELECT P.per_id, per_first_name, per_last_name, per_email FROM person P " +
-						  "WHERE NOT EXISTS ( " +
-						  "SELECT cer_code FROM job_cert " +
-						  "WHERE pos_code = ? " +
-						  "MINUS " +
-						  "SELECT cer_code FROM obtained_certificates " +
-						  "WHERE P.per_id = per_id " +
-						  ")) " +
-						  "SELECT per_id, per_first_name, per_last_name, per_email " +
-						  "FROM q_by_skill " +
-						  "INTERSECT " +
-						  "SELECT per_id, per_first_name, per_last_name, per_email " +
-						  "FROM q_by_cert";
-
-		try {
-			ps = ti.getConn().prepareStatement(psString);
 			ps.setInt(1, posCode);
 			ps.setInt(2, posCode);
+			ps.setInt(3, posCode);
+			ps.setInt(4, posCode);
 
 			java.sql.ResultSet rs = ps.executeQuery();
 			TableModel tableModel = new DefaultTableModel(ti.resultSet2Vector(rs), ti.getTitlesAsVector(rs));
@@ -700,11 +657,7 @@ public class BusinessProcesses extends javax.swing.JFrame {
 			sqle.printStackTrace();
 			JOptionPane.showMessageDialog(null, sqle.getMessage() );
 		}
-		
-		
-		*/
-		
-
+	
 	}
 	
 	/****************************
@@ -719,7 +672,7 @@ public class BusinessProcesses extends javax.swing.JFrame {
 		{
 			JLabel sectorResultPaneLabel = new JLabel();
 			sectorPanel.add(sectorResultPaneLabel);
-			sectorResultPaneLabel.setText("Job distribution by sector: ");
+			sectorResultPaneLabel.setText("Vacant job distribution by sector: ");
 			sectorResultPaneLabel.setBounds(35, 322, 320, 28);
 		}
 		{

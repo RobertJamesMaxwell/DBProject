@@ -85,8 +85,27 @@ public class QueryList {
 		}
 		
 		else if (number == 18) {
-
-			queryText = "";
+			queryText = "WITH certset(per_id, certcount) AS ( : " +
+						"SELECT DISTINCT per_id, COUNT(cer_code) : " +
+						"FROM (SELECT cer_code, per_id FROM job_cert NATURAL JOIN obtained_certificates WHERE pos_code = ? ) : " +
+						"GROUP BY per_id), : " +
+						"skillset(per_id, skillcount) AS ( : " +
+						"SELECT DISTINCT per_id, COUNT(ks_code) : " +
+						"FROM (SELECT ks_code, per_id FROM required_skill NATURAL JOIN obtained_skills WHERE pos_code = ? ) : " +
+						"GROUP BY per_id), : " +
+						"qualset(per_id, qualcount) AS (  : " +
+						"SELECT per_id, : " +
+					  	"(CASE : " +
+						"WHEN skillcount IS NULL THEN 0 : " +
+						"WHEN skillcount IS NOT NULL THEN skillcount : " +
+					  	"END) + : " +
+					  	"(CASE : " +
+						"WHEN certcount IS NULL THEN 0 : " +
+						"WHEN certcount IS NOT NULL THEN certcount : " +
+					  	"END ) AS qualcount : " +
+						"FROM skillset FULL OUTER JOIN certset USING(per_id) ) : " +
+						"SELECT per_id FROM qualset : " +
+						"WHERE (((SELECT COUNT(pos_code) FROM job_cert WHERE pos_code = ? ) + (SELECT COUNT(pos_code) FROM required_skill WHERE pos_code = ? )) - qualcount = 1)";			
 		}
 		
 		else if (number == 26) {
