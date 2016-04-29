@@ -544,23 +544,46 @@ public class BusinessProcesses extends javax.swing.JFrame {
 		
 		int perID = fjPanelPersonCombo.getSelectedIndex();
 		
+		 
+			
 		//Update psString to pull from Query 15 in QueryList
 		String psString = "WITH vacant_jobs(job_code) AS ( " +
 						"SELECT job_code " +
 						"FROM job MINUS " +
 						"SELECT job_code " +
-						"FROM works ) " +
-						"SELECT *  " +
-						"FROM job J " +
-						"WHERE EXISTS ( " +
-						"SELECT job_code  " +
-						"FROM vacant_jobs " +
-						"WHERE job_code = J.job_code)"; 
+						"FROM works ), " +
+						"q_by_cert(pos_code, cer_code) AS ( : " +
+					"SELECT J.pos_code, K.cer_code FROM job_profile J LEFT OUTER JOIN job_cert K ON(J.pos_code = K.pos_code) : " +
+					"WHERE NOT EXISTS ( : " +
+					"SELECT cer_code FROM job_cert : " +
+					"WHERE J.pos_code = pos_code : " +
+					"MINUS : " +
+					"SELECT cer_code FROM obtained_certificates : " +
+					"WHERE per_id = ? ) ), : " +
+					"q_by_skill(pos_code) AS( : " +
+					"SELECT J.pos_code FROM job_profile J : " +
+					"WHERE NOT EXISTS ( : " +
+					"SELECT ks_code FROM required_skill : " +
+					"WHERE J.pos_code = pos_code : " +
+					"MINUS : " +
+						"SELECT ks_code FROM obtained_skills : " +
+						"WHERE per_id = ? ) ), : " +
+						"q_by_pos(pos_code) AS ( : " +
+						"SELECT pos_code FROM q_by_skill INTERSECT SELECT pos_code FROM q_by_cert ) : " +
+						"SELECT *  : " +
+						"FROM job NATURAL JOIN vacant_jobs NATURAL JOIN q_by_pos";
+						
+
+		
+		psString = psString.replaceAll(":", "");
 		
 		try {
 			ps = ti.getConn().prepareStatement(psString, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-			//ps.setInt(1, perID);;
+			ps.setInt(1, perID);
+			ps.setInt(2, perID);
 
+
+			
 			fjrs = ps.executeQuery();
 			TableModel tableModel = new DefaultTableModel(ti.resultSet2Vector(fjrs), ti.getTitlesAsVector(fjrs));
 			fjresultTable.setModel(tableModel);
