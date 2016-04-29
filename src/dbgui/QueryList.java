@@ -435,6 +435,34 @@ public class QueryList {
 						"HAVING COUNT(ks_code) < 2 ";			
 		}
 		
+		else if (number == 23) {
+			queryText = "SELECT DISTINCT per_id, pos_code : " +
+						"FROM works NATURAL JOIN job : " +
+						"WHERE pos_code = ? ";
+		}
+		
+		else if (number == 24) {
+			queryText = "WITH unemployed(per_id) AS ( : " +
+						"SELECT per_id FROM person : " +
+						"MINUS : " +
+						"SELECT per_id FROM works WHERE end_date IS NULL ) : " +
+						"SELECT per_id  : " +
+						"FROM unemployed NATURAL JOIN works NATURAL JOIN job  : " +
+						"WHERE pos_code = ? ";
+		}
+		
+		else if (number == 25) {
+			queryText = "WITH emp_count(comp_id, emp_count) AS ( : " +
+						"SELECT comp_id, COUNT(comp_id) : " +
+						"FROM works NATURAL JOIN job NATURAL JOIN company : " +
+						"WHERE end_date IS NULL : " +
+						"GROUP BY comp_id ) : " +
+						"SELECT comp_id, MAX(emp_count) : " +
+						"FROM emp_count : " +
+						"WHERE emp_count = (SELECT MAX(emp_count) FROM emp_count) : " +
+						"GROUP BY comp_id ";
+		}
+		
 		else if (number == 26) {
 			queryText = "SELECT sector_name, COUNT(sector_name) as job_count: " +
 						"FROM sector NATURAL JOIN company NATURAL JOIN job NATURAL JOIN job_profile: " +
