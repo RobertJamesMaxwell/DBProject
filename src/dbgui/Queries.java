@@ -263,7 +263,7 @@ public class Queries extends javax.swing.JFrame {
 	}
 	
 	private void setVariableFields(int qn){
-		if (qn == 1 || qn == 4 || qn == 5 || qn == 25 )	{
+		if (qn == 1 || qn == 4 || qn == 5 || qn == 25 || qn == 26 || qn == 27 || qn == 29 || qn == 28 )	{
 			this.compIDField.setEditable(false);
 			this.perIDField.setEditable(false);
 			this.jobProfileField.setEditable(false);
@@ -318,13 +318,23 @@ public class Queries extends javax.swing.JFrame {
 	
 	private void drawToScreen(int qn, String queryString){
 
-		if (qn == 1 || qn == 4 || qn ==5 || qn == 25){
+		if (qn == 1 || qn == 4 || qn ==5 || qn == 25 || qn == 26 || qn == 27 || qn == 28){
 			String[] queryStringSpaced = queryString.split(":");
 			qArea.setText(queryStringSpaced[0]);
 			for (int i = 1; i < queryStringSpaced.length; i++)	{
 				qArea.append(" \n" + queryStringSpaced[i]);
 
 			};
+		}
+		
+		else if (qn == 29){
+			String[] queryStringSpaced = queryString.split(":");
+			qArea.setText(queryStringSpaced[0]);
+			for (int i = 1; i < queryStringSpaced.length; i++)	{
+				qArea.append(" \n" + queryStringSpaced[i]);
+
+			};
+			qArea.append(" \n" + "\n" + "NOTE: THIS QUERY IS THE SECOND PART OF QUERY 27");
 		}
 		
 		else if (qn == 6 || qn == 15 || qn == 16) {

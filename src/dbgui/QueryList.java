@@ -464,10 +464,104 @@ public class QueryList {
 		}
 		
 		else if (number == 26) {
-			queryText = "SELECT sector_name, COUNT(sector_name) as job_count: " +
-						"FROM sector NATURAL JOIN company NATURAL JOIN job NATURAL JOIN job_profile: " +
-						"GROUP BY sector_name: " +
+			queryText = "SELECT sector_name, COUNT(sector_name) as job_count : " +
+						"FROM sector NATURAL JOIN company NATURAL JOIN job NATURAL JOIN job_profile : " +
+						"GROUP BY sector_name : " +
 						"ORDER BY job_count";
+		}
+		
+		else if (number == 27) {
+			queryText = "WITH job_table(per_id, start_date, end_date, job_type, pay_type, pay_rate) AS ( : " +
+						"SELECT per_id, start_date, end_date, job_type, pay_type, : " +
+						"CASE WHEN pay_type = 'salary' THEN pay_rate : " +
+						"WHEN pay_type = 'wage' AND job_type = 'full-time' THEN pay_rate * 40 * 52 : " +
+						"WHEN pay_type = 'wage' AND job_type = 'part-time' THEN pay_rate * 20 * 52 : " +
+						"END AS payrate : " +
+						"FROM job NATURAL JOIN works ), : " +
+						"increased (per_id, increased_count) AS ( : " +
+						"SELECT per_id, COUNT(per_id) as increased_count  : " +
+						"FROM job_table S FULL OUTER JOIN job_table T USING(per_id) : " +
+						"WHERE S.pay_rate > T.pay_rate AND S.start_date > T.start_date : " +
+						"GROUP BY per_id : " +
+						"ORDER BY increased_count ), : " +
+						"decreased (per_id, decreased_count) AS( : " +
+						"SELECT per_id, COUNT(per_id) as decreased_count  : " +
+						"FROM job_table S FULL OUTER JOIN job_table T USING(per_id) : " +
+						"WHERE S.pay_rate < T.pay_rate AND S.start_date > T.start_date : " +
+						"GROUP BY per_id : " +
+						"ORDER BY decreased_count ) : " +
+						"SELECT SUM(increased.increased_count) as ratio_dec_to_inc : " +
+						"FROM increased : " +
+						"UNION : " +
+						"SELECT SUM(decreased.decreased_count) : " +
+						"FROM decreased ";
+		}
+		
+		else if (number == 28) {
+			queryText = "WITH job_openings(job_code, pos_code) AS ( : " +
+						"SELECT job_code, pos_code : " +
+						"FROM job_profile NATURAL JOIN job LEFT OUTER JOIN works USING (job_code) : " +
+						"WHERE per_id IS NULL ), : " +
+						"jobless_people(per_id) AS ( : " +
+						"SELECT per_id : " +
+						"FROM person LEFT OUTER JOIN works USING (per_id) : " +
+						"WHERE job_code IS NULL ), : " +
+						"openings_cross_people(job_code, pos_code, per_id) AS ( : " +
+						"SELECT job_code, pos_code, per_id  : " +
+						"FROM job_openings, jobless_people ), : " +
+						"q_by_cert(pos_code, cer_code, per_id) AS ( : " +
+						"SELECT J.pos_code, K.cer_code, J.per_id  : " +
+						"FROM openings_cross_people J FULL OUTER JOIN job_cert K ON(J.pos_code = K.pos_code) : " +
+						"WHERE NOT EXISTS ( : " +
+						"SELECT cer_code  : " +
+						"FROM job_profile NATURAL JOIN job_cert : " +
+						"WHERE J.pos_code = pos_code : " +
+						"MINUS : " +
+						"SELECT cer_code : " + 
+						"FROM openings_cross_people NATURAL JOIN obtained_certificates : " +
+						"WHERE J.per_id = per_id ) ), : " +
+						"q_by_skill(pos_code, per_id) AS ( : " +
+						"SELECT J.pos_code, J.per_id  : " +
+						"FROM openings_cross_people J : " +
+						"WHERE NOT EXISTS ( : " +
+						"SELECT ks_code FROM required_skill : " +
+						"WHERE J.pos_code = pos_code : " +
+						"MINUS : " +
+						"SELECT ks_code FROM obtained_skills : " +
+						"WHERE J.per_id = per_id ) ), : " +
+						"jobless_q_by_opening (pos_code, per_id) AS ( : " +
+						"SELECT pos_code, per_id FROM q_by_skill : " +
+						"INTERSECT : " +
+						"SELECT pos_code, per_id FROM q_by_cert ), : " +
+						"number_openings (pos_code, num_openings) AS ( : " +
+						"SELECT pos_code, COUNT(pos_code) AS num_openings : " +
+						"FROM job_openings : " +
+						"GROUP BY pos_code ), : " +
+						"num_q_jobless (pos_code, num_q_jobless) AS ( : " +
+						"SELECT pos_code, COUNT(per_id) : " +
+						"FROM jobless_q_by_opening : " +
+						"GROUP BY pos_code ) : " +
+						"SELECT pos_code, num_openings, num_q_jobless, num_openings - num_q_jobless AS difference : " +
+						"FROM number_openings LEFT OUTER JOIN num_q_jobless USING(pos_code) : " +
+						"WHERE num_q_jobless IS NOT NULL : " +
+						"ORDER BY pos_code ";
+		}
+		
+		else if (number == 29) {
+			queryText = "WITH jobs_in_sector (job_code, sector_name, pos_code, per_id, start_date, end_date, job_type, pay_type, pay_rate) AS ( : " +
+						"SELECT job_code, sector_name, pos_code, per_id, start_date, end_date, job_type, pay_type, : " +
+						"CASE WHEN pay_type = 'salary' THEN pay_rate : " +
+						"WHEN pay_type = 'wage' AND job_type = 'full-time' THEN pay_rate * 40 * 52 : " +
+						"WHEN pay_type = 'wage' AND job_type = 'part-time' THEN pay_rate * 20 * 52 : " +
+						"END AS payrate : " +
+						"FROM sector NATURAL JOIN company NATURAL JOIN job NATURAL JOIN works : " +
+						"WHERE sector_name = 'Technology' ), : " +
+						"person_percent_raise (per_id, percent_raise) AS ( : " +
+						"SELECT per_id, (S.pay_rate / T.pay_rate * 100) AS percent_raise : " +
+						"FROM jobs_in_sector S FULL OUTER JOIN jobs_in_sector T USING(per_id) : " +
+						"WHERE S.pay_rate > T.pay_rate AND S.start_date > T.start_date ) : " +
+						"SELECT AVG (percent_raise) : " +
+						"FROM person_percent_raise ";
 		}
 		
 		else if (number == 50) {
